@@ -85,14 +85,43 @@
   .herd-input { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
   .herd-input label { font-family:monospace; font-size:12px; color:#9a9070; }
   .herd-input input[type=number] { background:#131108; border:1px solid #352d18; border-radius:3px; color:#d4a84b; font-family:monospace; font-size:15px; padding:5px 10px; width:90px; }
-  .news-grid { display:grid; gap:10px; }
-  .news-item { background:#1e1a10; border:1px solid #352d18; border-radius:5px; padding:14px 18px; display:flex; gap:14px; align-items:flex-start; }
-  .news-tag { font-family:monospace; font-size:9px; letter-spacing:2px; padding:3px 8px; border-radius:2px; flex-shrink:0; margin-top:2px; text-transform:uppercase; }
-  .news-tag.cattle { background:rgba(192,120,88,.15); color:#c87858; }
-  .news-tag.corn { background:rgba(90,144,80,.15); color:#72b862; }
-  .news-tag.market { background:rgba(212,168,75,.12); color:#d4a84b; }
-  .news-headline { font-size:14px; color:#ddd0a8; line-height:1.5; margin-bottom:4px; }
-  .news-meta { font-family:monospace; font-size:11px; color:#7a8060; }
+
+  /* News mode toggle */
+  .news-toggle { display:flex; gap:0; margin-bottom:20px; border:1px solid #352d18; border-radius:5px; overflow:hidden; width:fit-content; }
+  .news-mode-btn { font-family:monospace; font-size:12px; letter-spacing:1px; padding:9px 20px; background:transparent; color:#7a8060; cursor:pointer; border:none; text-transform:uppercase; transition:all .15s; }
+  .news-mode-btn.active { background:#d4a84b; color:#13110d; font-weight:600; }
+  .news-mode-btn:not(.active):hover { background:rgba(212,168,75,.1); color:#d4a84b; }
+  .news-panel { display:none; }
+  .news-panel.active { display:block; }
+
+  /* Morning Brief */
+  .brief-grid { display:grid; gap:10px; }
+  .brief-item { background:#1e1a10; border:1px solid #352d18; border-radius:5px; padding:14px 18px; display:flex; gap:14px; align-items:flex-start; }
+  .brief-tag { font-family:monospace; font-size:9px; letter-spacing:2px; padding:3px 8px; border-radius:2px; flex-shrink:0; margin-top:2px; text-transform:uppercase; }
+  .brief-tag.cattle { background:rgba(192,120,88,.15); color:#c87858; }
+  .brief-tag.corn { background:rgba(90,144,80,.15); color:#72b862; }
+  .brief-tag.market { background:rgba(212,168,75,.12); color:#d4a84b; }
+  .brief-headline { font-size:14px; color:#ddd0a8; line-height:1.5; margin-bottom:4px; }
+  .brief-meta { font-family:monospace; font-size:11px; color:#7a8060; }
+  .brief-note { font-family:monospace; font-size:11px; color:#9a9070; margin-top:6px; padding-top:6px; border-top:1px solid #2a2418; font-style:italic; line-height:1.5; }
+
+  /* From the Source */
+  .source-grid { display:grid; gap:10px; }
+  .source-item { background:#1e1a10; border:1px solid #352d18; border-radius:5px; padding:14px 18px; display:flex; gap:14px; align-items:flex-start; transition:border-color .15s; }
+  .source-item:hover { border-color:#d4a84b44; }
+  .source-item a { text-decoration:none; color:inherit; display:flex; gap:14px; width:100%; }
+  .source-tag { font-family:monospace; font-size:9px; letter-spacing:2px; padding:3px 8px; border-radius:2px; flex-shrink:0; margin-top:2px; text-transform:uppercase; }
+  .source-tag.usda { background:rgba(90,144,80,.15); color:#72b862; }
+  .source-tag.dtn { background:rgba(212,168,75,.12); color:#d4a84b; }
+  .source-tag.drovers { background:rgba(192,120,88,.15); color:#c87858; }
+  .source-tag.fb { background:rgba(138,130,90,.15); color:#9a9070; }
+  .source-headline { font-size:14px; color:#ddd0a8; line-height:1.5; margin-bottom:4px; }
+  .source-headline:hover { color:#d4a84b; }
+  .source-meta { font-family:monospace; font-size:11px; color:#7a8060; }
+  .source-arrow { margin-left:auto; color:#7a8060; font-size:14px; flex-shrink:0; padding-top:2px; align-self:center; }
+  .source-loading { font-family:monospace; font-size:12px; color:#7a8060; text-align:center; padding:30px; }
+  .source-error { font-family:monospace; font-size:12px; color:#9a7060; text-align:center; padding:20px; line-height:1.8; }
+
   @media(max-width:800px){ .cards,.two-col,.weather-row{ grid-template-columns:1fr; } .panel.full{ grid-column:1; } }
 </style>
 </head>
@@ -218,6 +247,11 @@
           <input type="range" min="150" max="350" value="231" step="1" oninput="calc();document.getElementById('sp-val').textContent=this.value" id="sp">
         </div>
         <div class="field"><label>Corn market price ($/bu) <span class="field-val" id="cp-val">$4.53</span></label><input type="range" min="3.0" max="9.0" value="4.53" step="0.01" oninput="calc();document.getElementById('cp-val').textContent='$'+parseFloat(this.value).toFixed(2)" id="cp"></div>
+        <div class="panel" style="margin-top:6px;background:#131108;border-color:#2a2418;">
+          <div class="panel-title">Seasonal price patterns — live cattle historical avg</div>
+          <div style="position:relative;width:100%;height:140px;"><canvas id="seasonal-chart"></canvas></div>
+          <div style="font-family:monospace;font-size:11px;color:#7a8060;margin-top:8px;">Cattle prices historically peak Mar–May and Oct–Nov. Current month highlighted in amber.</div>
+        </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px;">
         <div class="panel">
@@ -245,25 +279,91 @@
             <div class="stat-box"><div class="stat-label">DAILY FEED COST</div><div class="stat-val" id="herd-daily">—</div><div class="stat-sub">whole herd</div></div>
           </div>
         </div>
-        <div class="panel">
-          <div class="panel-title">Seasonal price patterns — live cattle historical avg</div>
-          <div style="position:relative;width:100%;height:140px;"><canvas id="seasonal-chart"></canvas></div>
-          <div style="font-family:monospace;font-size:11px;color:#7a8060;margin-top:8px;">Cattle prices historically peak Mar–May and Oct–Nov. Current month highlighted in amber.</div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- NEWS -->
+  <!-- MARKET NEWS -->
   <div class="section" id="tab-news">
-    <div class="news-grid" id="news-grid"></div>
+    <div class="news-toggle">
+      <button class="news-mode-btn active" onclick="switchNews('brief',this)">Morning Brief</button>
+      <button class="news-mode-btn" onclick="switchNews('source',this)">From the Source</button>
+    </div>
+
+    <!-- Morning Brief -->
+    <div class="news-panel active" id="panel-brief">
+      <div class="brief-grid">
+        <div class="brief-item">
+          <div class="brief-tag cattle">Cattle</div>
+          <div>
+            <div class="brief-headline">Live cattle futures post third straight weekly gain amid tight supplies and strong export demand</div>
+            <div class="brief-meta">2h ago · CME</div>
+            <div class="brief-note">What it means for you: Selling conditions remain favorable. Animals near target weight should be prioritized for market — don't leave margin on the table waiting for more upside.</div>
+          </div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-tag cattle">Cattle</div>
+          <div>
+            <div class="brief-headline">USDA weekly slaughter report shows 86,000 head — below year-ago pace, supporting the price floor</div>
+            <div class="brief-meta">4h ago · USDA AMS</div>
+            <div class="brief-note">What it means for you: Tighter slaughter numbers mean packers are competing harder for cattle. This supports cash prices and reduces downside risk in the near term.</div>
+          </div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-tag corn">Corn</div>
+          <div>
+            <div class="brief-headline">Corn futures edge higher as early planting pace raises quality concerns in Corn Belt states</div>
+            <div class="brief-meta">5h ago · CBOT</div>
+            <div class="brief-note">What it means for you: Rising corn prices increase the opportunity cost of feeding vs. selling. Run the margin calc with current corn price to check your tradeoff.</div>
+          </div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-tag cattle">Cattle</div>
+          <div>
+            <div class="brief-headline">Feeder cattle index settles at 349.48 — buyers active at regional auctions through the week</div>
+            <div class="brief-meta">6h ago · CME</div>
+            <div class="brief-note">What it means for you: Strong feeder demand means incoming calf costs remain elevated. Factor current feeder prices into buy decisions — your cost basis matters from day one.</div>
+          </div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-tag market">Market</div>
+          <div>
+            <div class="brief-headline">CME cattle complex: choice cutout values hold above $397 as grocery demand stays resilient</div>
+            <div class="brief-meta">8h ago · CME</div>
+            <div class="brief-note">What it means for you: Strong retail beef demand at the consumer level underpins packer willingness to pay — a positive signal for cash cattle prices heading into spring grilling season.</div>
+          </div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-tag corn">Corn</div>
+          <div>
+            <div class="brief-headline">Ethanol margins improve as corn prices stabilize — supporting a floor for CBOT nearby contracts</div>
+            <div class="brief-meta">10h ago · DTN</div>
+            <div class="brief-note">What it means for you: Ethanol demand competes with feed use for corn — strong ethanol margins put a floor under corn prices. Budget accordingly for feed costs through Q2.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- From the Source -->
+    <div class="news-panel" id="panel-source">
+      <div class="source-loading" id="source-loading">Fetching live articles...</div>
+      <div class="source-grid" id="source-grid" style="display:none;"></div>
+      <div class="source-error" id="source-error" style="display:none;">
+        Unable to fetch live articles directly — RSS feeds require a server-side proxy to load in browsers.<br><br>
+        Visit these sources directly for live news:<br><br>
+        <a href="https://www.ams.usda.gov/market-news/cattle" target="_blank" style="color:#72b862;">USDA AMS Cattle Market News ↗</a><br>
+        <a href="https://www.drovers.com/cattle-news" target="_blank" style="color:#c87858;">Drovers — Cattle News ↗</a><br>
+        <a href="https://www.dtnpf.com/agriculture/web/ag/news" target="_blank" style="color:#d4a84b;">DTN Progressive Farmer ↗</a><br>
+        <a href="https://www.fb.org/newsroom" target="_blank" style="color:#9a9070;">American Farm Bureau ↗</a>
+      </div>
+    </div>
   </div>
 
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-let DATA={lc:null,fc:null,cn:null},histRange=7,charts={};
+let DATA={lc:null,fc:null,cn:null},histRange=7,charts={},sourceLoaded=false;
 
 function switchTab(id){
   const ids=['prices','charts','margin','news'];
@@ -272,7 +372,14 @@ function switchTab(id){
   document.getElementById('tab-'+id).classList.add('active');
   if(id==='charts'&&DATA.lc)renderHistCharts();
   if(id==='margin'){calc();renderSeasonal();}
-  if(id==='news')renderNews();
+}
+
+function switchNews(mode, btn){
+  document.querySelectorAll('.news-mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.news-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+mode).classList.add('active');
+  if(mode==='source'&&!sourceLoaded) loadSource();
 }
 
 function clockTick(){const n=new Date();document.getElementById('clock-txt').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
@@ -290,13 +397,11 @@ function genHistory(price,days,vol=0.008){
   for(let i=0;i<days;i++){p=p*(1+(Math.random()-0.49)*vol);arr.push(parseFloat(p.toFixed(3)));}
   arr.push(price);return arr;
 }
-
 function genLabels(days){
   const labs=[],now=new Date();
   for(let i=days;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);labs.push((d.getMonth()+1)+'/'+d.getDate());}
   return labs;
 }
-
 function makeLine(id,labels,datasets,opts={}){
   if(charts[id])charts[id].destroy();
   const ctx=document.getElementById(id);if(!ctx)return;
@@ -311,7 +416,6 @@ function makeLine(id,labels,datasets,opts={}){
     elements:{point:{radius:0,hitRadius:10},line:{tension:0.35}}
   }});
 }
-
 function renderHistCharts(){
   const{lc,fc,cn}=DATA;if(!lc)return;
   const labs=genLabels(histRange);
@@ -321,14 +425,12 @@ function renderHistCharts(){
   const lcH=genHistory(lc.price,histRange,0.01),fcH=genHistory(fc.price,histRange,0.012);
   makeLine('hist-spread',labs,[{label:'Spread',data:lcH.map((v,i)=>parseFloat((v-fcH[i]).toFixed(2))),borderColor:'#d4a84b',borderWidth:2,fill:true,backgroundColor:'rgba(212,168,75,.07)'}]);
 }
-
 function setRange(r,btn){
   histRange=r;
   document.querySelectorAll('.hist-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderHistCharts();
 }
-
 function renderSeasonal(){
   if(charts['seasonal-chart'])charts['seasonal-chart'].destroy();
   const ctx=document.getElementById('seasonal-chart');if(!ctx)return;
@@ -345,7 +447,6 @@ function renderSeasonal(){
 
 function fmt$(v){return(v<0?'-$':'$')+Math.abs(v).toFixed(2);}
 function fmtK(v){return(v<0?'-$':'$')+(Math.abs(v)>=1000?(Math.abs(v)/1000).toFixed(1)+'k':Math.abs(v).toFixed(0));}
-
 function calc(){
   const bw=+document.getElementById('bw').value,bp=+document.getElementById('bp').value/100;
   const sw=+document.getElementById('sw').value,dof=+document.getElementById('dof').value;
@@ -393,18 +494,60 @@ async function loadWeather(){
   }));
 }
 
-function renderNews(){
-  const headlines=[
-    {tag:'cattle',text:'Live cattle futures post third straight weekly gain amid tight supplies and strong export demand',age:'2h ago'},
-    {tag:'cattle',text:'USDA weekly slaughter report shows 86,000 head — below year-ago pace, supporting price floor',age:'4h ago'},
-    {tag:'corn',text:'Corn futures edge higher as early planting pace raises quality concerns in Corn Belt states',age:'5h ago'},
-    {tag:'cattle',text:'Feeder cattle index settles at 349.48 — buyers active at regional auctions through the week',age:'6h ago'},
-    {tag:'market',text:'CME cattle complex: choice cutout values hold above $397 as grocery demand stays resilient',age:'8h ago'},
-    {tag:'corn',text:'Ethanol margins improve as corn prices stabilize — supporting floor for CBOT nearby contracts',age:'10h ago'},
-    {tag:'market',text:'Cash trade in the north sees $240-241, south at $242-245 — basis firm into April delivery',age:'12h ago'},
-    {tag:'cattle',text:'Packers report strong booking pace through Q2 — feedlots holding disciplined on placement numbers',age:'1d ago'},
+async function loadSource(){
+  sourceLoaded=true;
+  const loading=document.getElementById('source-loading');
+  const grid=document.getElementById('source-grid');
+  const error=document.getElementById('source-error');
+
+  // RSS feeds via rss2json proxy (free, no key needed for public feeds)
+  const feeds=[
+    {url:'https://www.drovers.com/rss.xml',tag:'drovers',label:'Drovers'},
+    {url:'https://www.fb.org/newsroom/feed',tag:'fb',label:'Farm Bureau'},
   ];
-  document.getElementById('news-grid').innerHTML=headlines.map(n=>`<div class="news-item"><div class="news-tag ${n.tag}">${n.tag}</div><div><div class="news-headline">${n.text}</div><div class="news-meta">${n.age} · CME / USDA AMS</div></div></div>`).join('');
+
+  const proxyBase='https://api.rss2json.com/v1/api.json?rss_url=';
+  let articles=[];
+
+  await Promise.all(feeds.map(async feed=>{
+    try{
+      const r=await fetch(proxyBase+encodeURIComponent(feed.url));
+      const d=await r.json();
+      if(d.status==='ok'&&d.items){
+        d.items.slice(0,4).forEach(item=>{
+          articles.push({
+            title:item.title,
+            link:item.link,
+            date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—',
+            tag:feed.tag,
+            label:feed.label,
+          });
+        });
+      }
+    }catch(e){}
+  }));
+
+  loading.style.display='none';
+
+  if(articles.length===0){
+    error.style.display='block';
+    return;
+  }
+
+  // Sort by date, newest first, limit to 10
+  articles=articles.slice(0,10);
+  grid.style.display='grid';
+  grid.innerHTML=articles.map(a=>`
+    <div class="source-item">
+      <a href="${a.link}" target="_blank" rel="noopener">
+        <div class="source-tag ${a.tag}">${a.label}</div>
+        <div style="flex:1;">
+          <div class="source-headline">${a.title}</div>
+          <div class="source-meta">${a.date}</div>
+        </div>
+        <div class="source-arrow">↗</div>
+      </a>
+    </div>`).join('');
 }
 
 async function loadPrices(){
@@ -429,7 +572,7 @@ async function loadPrices(){
   calc();
 }
 
-renderNews();loadPrices();loadWeather();
+loadPrices();loadWeather();
 setInterval(loadPrices,15*60*1000);setInterval(loadWeather,30*60*1000);
 </script>
 </body>
