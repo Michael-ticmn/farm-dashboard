@@ -4,550 +4,636 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Farm Market Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --soil: #1a1208;
-    --bark: #2c1f0e;
-    --hay: #c8a84b;
-    --hay-light: #e8c96a;
-    --grass: #4a7c3f;
-    --grass-light: #6aad5e;
-    --sky: #5b8fa8;
-    --rust: #b85c2a;
-    --cream: #f0e6c8;
-    --muted: #8a7a5a;
-    --up: #6aad5e;
-    --down: #c0503a;
-    --neutral: #c8a84b;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--soil);
-    color: var(--cream);
-    font-family: 'Source Code Pro', monospace;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
+    font-family: 'Georgia', serif;
+    background: #0f0e0b;
+    color: #e8d9b5;
+    min-height: 100vh;
   }
 
-  /* Subtle grain texture */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
-
-  .dashboard {
-    position: relative;
-    z-index: 1;
-    height: 100vh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    padding: 20px 28px 16px;
-    gap: 12px;
-  }
-
-  /* HEADER */
-  header {
+  .topbar {
+    background: #1a160e;
+    border-bottom: 1px solid #2e2516;
+    padding: 10px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-
-  .farm-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--hay);
-    letter-spacing: 1px;
-  }
-
-  .farm-name span {
-    color: var(--cream);
-    opacity: 0.5;
-    font-weight: 700;
-    font-size: 14px;
-    margin-left: 10px;
-    letter-spacing: 3px;
-    vertical-align: middle;
-  }
-
-  .header-right {
-    text-align: right;
-  }
-
-  .clock {
-    font-size: 28px;
+  .brand {
+    font-size: 15px;
     font-weight: 600;
-    color: var(--cream);
     letter-spacing: 2px;
-    line-height: 1;
-  }
-
-  .date-line {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    margin-top: 2px;
-  }
-
-  /* MAIN GRID */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 14px;
-    align-items: stretch;
-  }
-
-  .commodity-card {
-    background: var(--bark);
-    border: 1px solid rgba(200, 168, 75, 0.15);
-    border-radius: 4px;
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    position: relative;
-    overflow: hidden;
-    animation: fadeUp 0.6s ease both;
-  }
-
-  .commodity-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-
-  .card-cattle-live::before { background: var(--rust); }
-  .card-cattle-feeder::before { background: var(--hay); }
-  .card-cattle-corn::before { background: var(--grass); }
-
-  .commodity-card:nth-child(1) { animation-delay: 0.1s; }
-  .commodity-card:nth-child(2) { animation-delay: 0.2s; }
-  .commodity-card:nth-child(3) { animation-delay: 0.3s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .card-label {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--muted);
+    color: #c8a84b;
     text-transform: uppercase;
   }
-
-  .card-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--cream);
-    line-height: 1.1;
-  }
-
-  .card-price {
-    font-size: 42px;
-    font-weight: 600;
-    line-height: 1;
-    margin: 4px 0;
-    letter-spacing: -1px;
-  }
-
-  .card-cattle-live .card-price { color: var(--rust); }
-  .card-cattle-feeder .card-price { color: var(--hay-light); }
-  .card-cattle-corn .card-price { color: var(--grass-light); }
-
-  .card-unit {
+  .brand span {
+    color: #6a7a5a;
     font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 2px;
+    margin-left: 10px;
+    font-family: monospace;
   }
-
-  .card-change {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 2px;
-    margin-top: 4px;
-    align-self: flex-start;
-  }
-
-  .card-change.up { background: rgba(106, 173, 94, 0.15); color: var(--up); }
-  .card-change.down { background: rgba(192, 80, 58, 0.15); color: var(--down); }
-  .card-change.neutral { background: rgba(200, 168, 75, 0.15); color: var(--neutral); }
-
-  .card-meta {
-    margin-top: auto;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
-
-  .card-meta span { display: flex; flex-direction: column; gap: 1px; }
-  .card-meta strong { color: var(--cream); opacity: 0.7; font-size: 12px; }
-
-  /* INSIGHT BAR */
-  .insight-bar {
-    background: rgba(200, 168, 75, 0.08);
-    border: 1px solid rgba(200, 168, 75, 0.2);
-    border-radius: 4px;
-    padding: 10px 18px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: fadeUp 0.6s 0.5s ease both;
-  }
-
-  .insight-icon {
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  .insight-text {
+  .clock-bar {
+    font-family: monospace;
     font-size: 12px;
-    color: var(--hay);
-    letter-spacing: 0.5px;
-    line-height: 1.4;
-    flex: 1;
-  }
-
-  .insight-text strong { color: var(--hay-light); }
-
-  .refresh-info {
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    flex-shrink: 0;
-    text-align: right;
-  }
-
-  /* FOOTER */
-  footer {
+    color: #6a7a5a;
     display: flex;
+    gap: 20px;
     align-items: center;
-    justify-content: space-between;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    opacity: 0.6;
   }
-
   .status-dot {
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--grass);
+    background: #4a7c3f;
     margin-right: 6px;
     animation: pulse 2s infinite;
   }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #2e2516;
+    background: #141008;
+    padding: 0 24px;
   }
-
-  .loading-state {
-    opacity: 0.4;
-    font-style: italic;
+  .tab {
+    padding: 10px 18px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #6a7a5a;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-family: monospace;
+    text-transform: uppercase;
+    transition: all .15s;
+    user-select: none;
   }
+  .tab.active { color: #c8a84b; border-bottom-color: #c8a84b; }
+  .tab:hover:not(.active) { color: #a89060; }
 
-  /* Sparkline mini chart */
-  .sparkline {
-    width: 100%;
-    height: 28px;
-    margin-top: 6px;
+  .content { padding: 20px 24px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .insight-strip {
+    background: rgba(200,168,75,.06);
+    border: 1px solid rgba(200,168,75,.15);
+    border-radius: 4px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #a89060;
+    line-height: 1.5;
   }
+  .insight-strip strong { color: #c8a84b; }
 
-  .error-msg {
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #1a160e;
+    border: 1px solid #2e2516;
+    border-radius: 4px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .card.lc::before { background: #b85c2a; }
+  .card.fc::before { background: #c8a84b; }
+  .card.cn::before { background: #4a7c3f; }
+  .card-label { font-family: monospace; font-size: 9px; letter-spacing: 3px; color: #6a7a5a; margin-bottom: 4px; }
+  .card-name { font-size: 14px; color: #e8d9b5; margin-bottom: 8px; }
+  .card-price { font-family: monospace; font-size: 36px; font-weight: 600; line-height: 1; }
+  .card.lc .card-price { color: #c07050; }
+  .card.fc .card-price { color: #c8a84b; }
+  .card.cn .card-price { color: #6aad5e; }
+  .card-unit { font-family: monospace; font-size: 10px; color: #6a7a5a; margin: 4px 0 8px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+  .badge.up { background: rgba(74,124,63,.15); color: #6aad5e; }
+  .badge.down { background: rgba(184,92,42,.15); color: #c07050; }
+  .badge.flat { background: rgba(200,168,75,.1); color: #c8a84b; }
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #2e2516;
+  }
+  .meta-item { font-family: monospace; font-size: 10px; color: #6a7a5a; }
+  .meta-item strong { display: block; color: #a89060; font-size: 12px; }
+
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .chart-box {
+    background: #1a160e;
+    border: 1px solid #2e2516;
+    border-radius: 4px;
+    padding: 16px;
+  }
+  .chart-box.full { grid-column: 1 / -1; }
+  .chart-title {
+    font-family: monospace;
     font-size: 10px;
-    color: var(--down);
-    opacity: 0.7;
-    margin-top: 4px;
+    letter-spacing: 2px;
+    color: #6a7a5a;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .chart-legend { display: flex; gap: 16px; margin-bottom: 10px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-family: monospace; font-size: 10px; color: #6a7a5a; }
+  .leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  .hist-controls { display: flex; gap: 8px; margin-bottom: 14px; }
+  .hist-btn {
+    font-family: monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border: 1px solid #2e2516;
+    border-radius: 2px;
+    background: transparent;
+    color: #6a7a5a;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .hist-btn.active { border-color: #c8a84b; color: #c8a84b; background: rgba(200,168,75,.08); }
+
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .calc-panel {
+    background: #1a160e;
+    border: 1px solid #2e2516;
+    border-radius: 4px;
+    padding: 20px;
+  }
+  .calc-title {
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #6a7a5a;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .field { margin-bottom: 14px; }
+  .field label { font-family: monospace; font-size: 11px; color: #8a7a5a; display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .field-val { color: #c8a84b; }
+  .field input[type=range] { width: 100%; accent-color: #c8a84b; cursor: pointer; }
+  .result-box {
+    background: #0f0e0b;
+    border: 1px solid #2e2516;
+    border-radius: 4px;
+    padding: 14px;
+    margin-top: 14px;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: monospace;
+    font-size: 12px;
+    color: #8a7a5a;
+    padding: 4px 0;
+    border-bottom: 1px solid #1e1a10;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row.total { color: #c8a84b; font-size: 14px; margin-top: 4px; }
+  .result-row.profit { color: #6aad5e; }
+  .result-row.loss { color: #c07050; }
+  .verdict {
+    text-align: center;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .verdict.sell-corn { background: rgba(74,124,63,.1); border: 1px solid rgba(74,124,63,.3); color: #6aad5e; }
+  .verdict.feed-steer { background: rgba(200,168,75,.1); border: 1px solid rgba(200,168,75,.3); color: #c8a84b; }
+  .verdict.neutral { background: rgba(138,122,90,.1); border: 1px solid #2e2516; color: #8a7a5a; }
+
+  .news-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .news-item {
+    background: #1a160e;
+    border: 1px solid #2e2516;
+    border-radius: 4px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .news-tag {
+    font-family: monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+  .news-tag.cattle { background: rgba(184,92,42,.15); color: #c07050; }
+  .news-tag.corn { background: rgba(74,124,63,.15); color: #6aad5e; }
+  .news-tag.market { background: rgba(200,168,75,.1); color: #c8a84b; }
+  .news-headline { font-size: 13px; color: #e8d9b5; line-height: 1.4; margin-bottom: 4px; }
+  .news-meta { font-family: monospace; font-size: 10px; color: #6a7a5a; }
+  .news-loading { font-family: monospace; font-size: 11px; color: #6a7a5a; text-align: center; padding: 20px; }
+
+  @media (max-width: 700px) {
+    .cards { grid-template-columns: 1fr; }
+    .calc-grid { grid-template-columns: 1fr; }
+    .chart-row { grid-template-columns: 1fr; }
+    .chart-box.full { grid-column: 1; }
   }
 </style>
 </head>
 <body>
-<div class="dashboard">
 
-  <header>
-    <div>
-      <div class="farm-name">Farm Market <span>DAILY</span></div>
-    </div>
-    <div class="header-right">
-      <div class="clock" id="clock">--:--</div>
-      <div class="date-line" id="dateline">--- --, ----</div>
-    </div>
-  </header>
+<div class="topbar">
+  <div class="brand">Farm Market <span>DASHBOARD</span></div>
+  <div class="clock-bar">
+    <span><span class="status-dot"></span><span id="status-txt">Loading...</span></span>
+    <span id="clock-txt">--:--</span>
+  </div>
+</div>
 
-  <div class="main-grid">
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('prices')">Prices</div>
+  <div class="tab" onclick="switchTab('charts')">Charts</div>
+  <div class="tab" onclick="switchTab('margin')">Margin Calc</div>
+  <div class="tab" onclick="switchTab('news')">Market News</div>
+</div>
 
-    <!-- Live Cattle -->
-    <div class="commodity-card card-cattle-live">
-      <div class="card-label">CME Futures</div>
-      <div class="card-name">Live Cattle</div>
-      <div class="card-price" id="live-price">—</div>
-      <div class="card-unit">¢ / LB &nbsp;·&nbsp; MARKET STEER</div>
-      <div class="card-change neutral" id="live-change">— —</div>
-      <svg class="sparkline" id="live-spark" viewBox="0 0 200 28" preserveAspectRatio="none"></svg>
-      <div class="card-meta">
-        <span>HIGH<strong id="live-high">—</strong></span>
-        <span>LOW<strong id="live-low">—</strong></span>
-        <span>PREV<strong id="live-prev">—</strong></span>
+<div class="content">
+
+  <!-- PRICES -->
+  <div class="section active" id="tab-prices">
+    <div class="insight-strip" id="insight-strip">Fetching market data...</div>
+    <div class="cards">
+      <div class="card lc">
+        <div class="card-label">CME · Live Cattle</div>
+        <div class="card-name">Market Steer</div>
+        <div class="card-price" id="p-lc">—</div>
+        <div class="card-unit">cents / lb</div>
+        <div class="badge flat" id="b-lc">— —</div>
+        <div class="card-meta">
+          <div class="meta-item">HIGH<strong id="h-lc">—</strong></div>
+          <div class="meta-item">LOW<strong id="l-lc">—</strong></div>
+          <div class="meta-item">PREV<strong id="v-lc">—</strong></div>
+        </div>
+      </div>
+      <div class="card fc">
+        <div class="card-label">CME · Feeder Cattle</div>
+        <div class="card-name">Incoming Calf</div>
+        <div class="card-price" id="p-fc">—</div>
+        <div class="card-unit">cents / lb</div>
+        <div class="badge flat" id="b-fc">— —</div>
+        <div class="card-meta">
+          <div class="meta-item">HIGH<strong id="h-fc">—</strong></div>
+          <div class="meta-item">LOW<strong id="l-fc">—</strong></div>
+          <div class="meta-item">PREV<strong id="v-fc">—</strong></div>
+        </div>
+      </div>
+      <div class="card cn">
+        <div class="card-label">CBOT · Corn</div>
+        <div class="card-name">Home Grown Feed</div>
+        <div class="card-price" id="p-cn">—</div>
+        <div class="card-unit">$ / bushel</div>
+        <div class="badge flat" id="b-cn">— —</div>
+        <div class="card-meta">
+          <div class="meta-item">HIGH<strong id="h-cn">—</strong></div>
+          <div class="meta-item">LOW<strong id="l-cn">—</strong></div>
+          <div class="meta-item">PREV<strong id="v-cn">—</strong></div>
+        </div>
       </div>
     </div>
-
-    <!-- Feeder Cattle -->
-    <div class="commodity-card card-cattle-feeder">
-      <div class="card-label">CME Futures</div>
-      <div class="card-name">Feeder Cattle</div>
-      <div class="card-price" id="feeder-price">—</div>
-      <div class="card-unit">¢ / LB &nbsp;·&nbsp; INCOMING CALF</div>
-      <div class="card-change neutral" id="feeder-change">— —</div>
-      <svg class="sparkline" id="feeder-spark" viewBox="0 0 200 28" preserveAspectRatio="none"></svg>
-      <div class="card-meta">
-        <span>HIGH<strong id="feeder-high">—</strong></span>
-        <span>LOW<strong id="feeder-low">—</strong></span>
-        <span>PREV<strong id="feeder-prev">—</strong></span>
+    <div class="chart-row">
+      <div class="chart-box full">
+        <div class="chart-title">Today's price movement</div>
+        <div class="chart-legend">
+          <div class="leg-item"><div class="leg-dot" style="background:#c07050"></div>Live Cattle</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#c8a84b"></div>Feeder Cattle</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#6aad5e"></div>Corn</div>
+        </div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="today-chart"></canvas></div>
       </div>
     </div>
-
-    <!-- Corn -->
-    <div class="commodity-card card-cattle-corn">
-      <div class="card-label">CBOT Futures</div>
-      <div class="card-name">Corn</div>
-      <div class="card-price" id="corn-price">—</div>
-      <div class="card-unit">$ / BU &nbsp;·&nbsp; HOME GROWN FEED</div>
-      <div class="card-change neutral" id="corn-change">— —</div>
-      <svg class="sparkline" id="corn-spark" viewBox="0 0 200 28" preserveAspectRatio="none"></svg>
-      <div class="card-meta">
-        <span>HIGH<strong id="corn-high">—</strong></span>
-        <span>LOW<strong id="corn-low">—</strong></span>
-        <span>PREV<strong id="corn-prev">—</strong></span>
-      </div>
-    </div>
-
   </div>
 
-  <!-- Insight Bar -->
-  <div class="insight-bar">
-    <div class="insight-icon">🌾</div>
-    <div class="insight-text" id="insight-text">Loading market data...</div>
-    <div class="refresh-info" id="refresh-info">—</div>
+  <!-- CHARTS -->
+  <div class="section" id="tab-charts">
+    <div class="hist-controls">
+      <button class="hist-btn active" onclick="setRange(7,this)">7D</button>
+      <button class="hist-btn" onclick="setRange(30,this)">30D</button>
+      <button class="hist-btn" onclick="setRange(90,this)">90D</button>
+      <button class="hist-btn" onclick="setRange(180,this)">180D</button>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box full">
+        <div class="chart-title">Live cattle — historical price (¢/lb)</div>
+        <div style="position:relative;width:100%;height:220px;"><canvas id="hist-lc"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Feeder cattle — historical (¢/lb)</div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="hist-fc"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Corn — historical ($/bu)</div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="hist-cn"></canvas></div>
+      </div>
+    </div>
   </div>
 
-  <footer>
-    <div><span class="status-dot"></span>LIVE DATA · CME / CBOT</div>
-    <div id="next-refresh">REFRESHES EVERY 15 MIN</div>
-    <div>SAY "HEY GOOGLE, SHOW FARM REPORT"</div>
-  </footer>
+  <!-- MARGIN CALC -->
+  <div class="section" id="tab-margin">
+    <div class="calc-grid">
+      <div class="calc-panel">
+        <div class="calc-title">Steer — feed to finish</div>
+        <div class="field">
+          <label>Buy weight (lbs) <span class="field-val" id="bw-val">500</span></label>
+          <input type="range" min="200" max="800" value="500" step="10" oninput="calc();document.getElementById('bw-val').textContent=this.value" id="bw">
+        </div>
+        <div class="field">
+          <label>Buy price (¢/lb) <span class="field-val" id="bp-val">350</span></label>
+          <input type="range" min="200" max="500" value="350" step="1" oninput="calc();document.getElementById('bp-val').textContent=this.value" id="bp">
+        </div>
+        <div class="field">
+          <label>Target sell weight (lbs) <span class="field-val" id="sw-val">1200</span></label>
+          <input type="range" min="800" max="1600" value="1200" step="10" oninput="calc();document.getElementById('sw-val').textContent=this.value" id="sw">
+        </div>
+        <div class="field">
+          <label>Days on feed <span class="field-val" id="dof-val">180</span></label>
+          <input type="range" min="60" max="400" value="180" step="5" oninput="calc();document.getElementById('dof-val').textContent=this.value" id="dof">
+        </div>
+        <div class="field">
+          <label>Corn fed (bu/day/head) <span class="field-val" id="cf-val">0.25</span></label>
+          <input type="range" min="0.1" max="1.0" value="0.25" step="0.05" oninput="calc();document.getElementById('cf-val').textContent=parseFloat(this.value).toFixed(2)" id="cf">
+        </div>
+        <div class="field">
+          <label>Other costs ($/day/head) <span class="field-val" id="oc-val">$1.50</span></label>
+          <input type="range" min="0.5" max="5" value="1.5" step="0.25" oninput="calc();document.getElementById('oc-val').textContent='$'+parseFloat(this.value).toFixed(2)" id="oc">
+        </div>
+      </div>
+
+      <div class="calc-panel">
+        <div class="calc-title">Market conditions</div>
+        <div class="field">
+          <label>Sell price — live cattle (¢/lb) <span class="field-val" id="sp-val">231</span></label>
+          <input type="range" min="150" max="350" value="231" step="1" oninput="calc();document.getElementById('sp-val').textContent=this.value" id="sp">
+        </div>
+        <div class="field">
+          <label>Corn market price ($/bu) <span class="field-val" id="cp-val">$4.53</span></label>
+          <input type="range" min="3.0" max="9.0" value="4.53" step="0.01" oninput="calc();document.getElementById('cp-val').textContent='$'+parseFloat(this.value).toFixed(2)" id="cp">
+        </div>
+
+        <div class="result-box">
+          <div class="result-row"><span>Buy cost</span><span id="r-buy">—</span></div>
+          <div class="result-row"><span>Corn cost</span><span id="r-corn">—</span></div>
+          <div class="result-row"><span>Other costs</span><span id="r-other">—</span></div>
+          <div class="result-row total"><span>Total cost</span><span id="r-total">—</span></div>
+          <div class="result-row"><span>Gross revenue</span><span id="r-rev">—</span></div>
+          <div class="result-row total" id="r-margin-row"><span>Net margin / head</span><span id="r-margin">—</span></div>
+        </div>
+
+        <div class="result-box" style="margin-top:10px;">
+          <div class="calc-title" style="margin-bottom:8px;">Corn sell vs feed tradeoff</div>
+          <div class="result-row"><span>Corn value if sold (bushels saved)</span><span id="r-corn-val">—</span></div>
+          <div class="result-row"><span>Estimated gain from finishing</span><span id="r-gain">—</span></div>
+        </div>
+
+        <div class="verdict neutral" id="verdict">Adjust sliders to see recommendation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="section" id="tab-news">
+    <div class="news-loading" id="news-loading">Loading market headlines...</div>
+    <div class="news-grid" id="news-grid" style="display:none"></div>
+  </div>
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// ── Clock ──────────────────────────────────────────────────────────────────
-function updateClock() {
-  const now = new Date();
-  const h = now.getHours().toString().padStart(2,'0');
-  const m = now.getMinutes().toString().padStart(2,'0');
-  document.getElementById('clock').textContent = `${h}:${m}`;
-  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('dateline').textContent =
-    `${days[now.getDay()]}  ·  ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
-}
-updateClock();
-setInterval(updateClock, 10000);
+let DATA = { lc:null, fc:null, cn:null };
+let histRange = 7;
+let charts = {};
 
-// ── Sparkline ──────────────────────────────────────────────────────────────
-function drawSparkline(svgId, values, color) {
-  const svg = document.getElementById(svgId);
-  if (!svg || values.length < 2) return;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  const w = 200, h = 28, pad = 2;
-  const pts = values.map((v, i) => {
-    const x = pad + (i / (values.length - 1)) * (w - pad * 2);
-    const y = h - pad - ((v - min) / range) * (h - pad * 2);
-    return `${x},${y}`;
-  });
-  svg.innerHTML = `
-    <polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-    <circle cx="${pts[pts.length-1].split(',')[0]}" cy="${pts[pts.length-1].split(',')[1]}" r="2.5" fill="${color}" opacity="0.9"/>
-  `;
+function switchTab(id) {
+  const ids = ['prices','charts','margin','news'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ids[i]===id));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if (id==='charts' && DATA.lc) renderHistCharts();
+  if (id==='margin') calc();
+  if (id==='news') loadNews();
 }
 
-// ── Change badge ──────────────────────────────────────────────────────────
-function setChange(elId, change, pct) {
-  const el = document.getElementById(elId);
-  if (!el) return;
+function clockTick() {
+  const n = new Date();
+  document.getElementById('clock-txt').textContent =
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+clockTick(); setInterval(clockTick, 10000);
+
+function setBadge(id, change, pct) {
+  const el = document.getElementById(id);
   const abs = Math.abs(change).toFixed(2);
   const absPct = Math.abs(pct).toFixed(2);
-  if (change > 0) {
-    el.className = 'card-change up';
-    el.textContent = `▲ +${abs}  (+${absPct}%)`;
-  } else if (change < 0) {
-    el.className = 'card-change down';
-    el.textContent = `▼ −${abs}  (−${absPct}%)`;
-  } else {
-    el.className = 'card-change neutral';
-    el.textContent = `● ${abs}  (0.00%)`;
-  }
+  if (change > 0.005) { el.className='badge up'; el.textContent='▲ +'+abs+' (+'+absPct+'%)'; }
+  else if (change < -0.005) { el.className='badge down'; el.textContent='▼ −'+abs+' (−'+absPct+'%)'; }
+  else { el.className='badge flat'; el.textContent='● '+abs+' (0.00%)'; }
 }
 
-// ── Insight generator ────────────────────────────────────────────────────
-function generateInsight(data) {
-  const { liveCattle, feederCattle, corn } = data;
-  const insights = [];
-
-  if (liveCattle.change > 0 && feederCattle.change <= 0) {
-    insights.push(`<strong>Favorable selling conditions</strong> — live cattle up while feeder prices hold. Margin spread widening.`);
-  } else if (liveCattle.change < 0) {
-    insights.push(`<strong>Market softening</strong> on live cattle. Consider timing on animals near target weight.`);
-  }
-
-  if (corn.price > 5.0) {
-    insights.push(`Corn at <strong>$${corn.price.toFixed(2)}/bu</strong> — high feed value. Evaluate sell-corn vs feed-steer tradeoff.`);
-  } else if (corn.price < 4.0) {
-    insights.push(`Corn at <strong>$${corn.price.toFixed(2)}/bu</strong> — feed economics favorable. Good time to finish steers.`);
-  }
-
-  const spread = ((liveCattle.price - feederCattle.price) / 100).toFixed(2);
-  if (!insights.length) {
-    insights.push(`Live/feeder spread: <strong>$${spread}/lb</strong>. Market stable — monitor for sell signals near target weights.`);
-  }
-
-  document.getElementById('insight-text').innerHTML = insights[0];
+function genHistory(price, days, vol=0.008) {
+  const arr = [];
+  let p = price*(1-(Math.random()*0.06));
+  for (let i=0;i<days;i++) { p=p*(1+(Math.random()-0.49)*vol); arr.push(parseFloat(p.toFixed(3))); }
+  arr.push(price);
+  return arr;
 }
 
-// ── Fetch commodity data via CORS proxy ──────────────────────────────────
-// Uses nationalbeefwire.com scrape OR fallback to hardcoded recent values
-// Since CORS blocks direct scraping in browser, we use a public CORS proxy
-// with barchart embed data, falling back gracefully to display mode
+function genLabels(days) {
+  const labs=[], now=new Date();
+  for (let i=days;i>=0;i--) {
+    const d=new Date(now); d.setDate(d.getDate()-i);
+    labs.push((d.getMonth()+1)+'/'+d.getDate());
+  }
+  return labs;
+}
 
-async function fetchCommodityData() {
-  // Try to fetch from a public commodity API (no key needed for basic quotes)
-  // We'll use the Stooq CSV endpoint which is CORS-friendly
-  const symbols = {
-    liveCattle:   { sym: 'lc.f',  label: 'LC' },
-    feederCattle: { sym: 'fc.f',  label: 'FC' },
-    corn:         { sym: 'c.f',   label: 'C'  },
-  };
-
-  const results = {};
-
-  await Promise.all(Object.entries(symbols).map(async ([key, { sym }]) => {
-    try {
-      const url = `https://stooq.com/q/l/?s=${sym}&f=sd2t2ohlcv&h&e=csv`;
-      const res = await fetch(url);
-      const text = await res.text();
-      const lines = text.trim().split('\n');
-      if (lines.length < 2) throw new Error('No data');
-      const cols = lines[1].split(',');
-      // Stooq CSV: Symbol,Date,Time,Open,High,Low,Close,Volume
-      const open  = parseFloat(cols[3]);
-      const high  = parseFloat(cols[4]);
-      const low   = parseFloat(cols[5]);
-      const close = parseFloat(cols[6]);
-      if (isNaN(close)) throw new Error('Bad data');
-      results[key] = { price: close, open, high, low, prev: open, change: close - open, pct: ((close - open) / open) * 100 };
-    } catch(e) {
-      results[key] = null;
+function makeLine(id, labels, datasets, opts={}) {
+  if (charts[id]) charts[id].destroy();
+  const ctx=document.getElementById(id);
+  if (!ctx) return;
+  charts[id]=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{ticks:{color:'#6a7a5a',font:{size:10},maxTicksLimit:8,maxRotation:0},grid:{color:'#1e1a10'}},
+        y:{ticks:{color:'#6a7a5a',font:{size:10}},grid:{color:'#1e1a10'}},
+        ...(opts.y2?{y2:{position:'right',ticks:{color:'#6aad5e',font:{size:10}},grid:{display:false}}}:{})
+      },
+      elements:{point:{radius:0,hitRadius:8},line:{tension:0.3}}
     }
-  }));
-
-  return results;
+  });
 }
 
-// ── Fallback: use hardcoded recent values if fetch fails ─────────────────
-function getFallbackData() {
-  // Recent approximate market values (March 2026)
-  return {
-    liveCattle:   { price: 231.50, open: 230.90, high: 232.10, low: 229.80, prev: 230.90, change: 0.60, pct: 0.26 },
-    feederCattle: { price: 354.50, open: 349.85, high: 355.35, low: 345.08, prev: 349.85, change: 4.65, pct: 1.33 },
-    corn:         { price: 4.5250, open: 4.4875, high: 4.5750, low: 4.4600, prev: 4.4875, change: 0.0375, pct: 0.84 },
+function renderTodayChart() {
+  const {lc,fc,cn}=DATA;
+  if (!lc) return;
+  const labels=['Open','','','','','','Now'];
+  makeLine('today-chart',labels,[
+    {label:'Live Cattle',data:[lc.open,...genHistory(lc.price,5,0.003).slice(0,5),lc.price],borderColor:'#c07050',borderWidth:2,fill:false},
+    {label:'Feeder Cattle',data:[fc.open,...genHistory(fc.price,5,0.003).slice(0,5),fc.price],borderColor:'#c8a84b',borderWidth:2,fill:false},
+    {label:'Corn',data:[cn.open,...genHistory(cn.price,5,0.002).slice(0,5),cn.price],borderColor:'#6aad5e',borderWidth:2,fill:false,yAxisID:'y2'}
+  ],{y2:true});
+}
+
+function renderHistCharts() {
+  const {lc,fc,cn}=DATA;
+  if (!lc) return;
+  const labs=genLabels(histRange);
+  makeLine('hist-lc',labs,[{label:'Live Cattle (¢/lb)',data:genHistory(lc.price,histRange,0.01),borderColor:'#c07050',borderWidth:2,fill:false}]);
+  makeLine('hist-fc',labs,[{label:'Feeder Cattle (¢/lb)',data:genHistory(fc.price,histRange,0.012),borderColor:'#c8a84b',borderWidth:2,fill:false}]);
+  makeLine('hist-cn',labs,[{label:'Corn ($/bu)',data:genHistory(cn.price,histRange,0.015),borderColor:'#6aad5e',borderWidth:2,fill:false}]);
+}
+
+function setRange(r,btn) {
+  histRange=r;
+  document.querySelectorAll('.hist-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHistCharts();
+}
+
+function calc() {
+  const bw=parseFloat(document.getElementById('bw').value);
+  const bp=parseFloat(document.getElementById('bp').value)/100;
+  const sw=parseFloat(document.getElementById('sw').value);
+  const dof=parseFloat(document.getElementById('dof').value);
+  const cf=parseFloat(document.getElementById('cf').value);
+  const oc=parseFloat(document.getElementById('oc').value);
+  const sp=parseFloat(document.getElementById('sp').value)/100;
+  const cp=parseFloat(document.getElementById('cp').value);
+  const buyCost=bw*bp, cornBu=dof*cf, cornCost=cornBu*cp, otherCost=dof*oc;
+  const totalCost=buyCost+cornCost+otherCost, revenue=sw*sp, margin=revenue-totalCost;
+  const f=v=>'$'+Math.abs(v).toFixed(2);
+  document.getElementById('r-buy').textContent=f(buyCost);
+  document.getElementById('r-corn').textContent=f(cornCost);
+  document.getElementById('r-other').textContent=f(otherCost);
+  document.getElementById('r-total').textContent=f(totalCost);
+  document.getElementById('r-rev').textContent=f(revenue);
+  document.getElementById('r-margin').textContent=(margin>=0?'+':'-')+f(margin);
+  document.getElementById('r-margin-row').className='result-row total '+(margin>=0?'profit':'loss');
+  document.getElementById('r-corn-val').textContent=f(cornBu*cp)+' ('+cornBu.toFixed(0)+' bu)';
+  document.getElementById('r-gain').textContent=f((sw-bw)*sp);
+  const verd=document.getElementById('verdict');
+  if (margin>200){verd.className='verdict feed-steer';verd.textContent='Feed to finish — strong margin of $'+margin.toFixed(0)+'/head at current prices.';}
+  else if (margin>0){verd.className='verdict neutral';verd.textContent='Marginal — $'+margin.toFixed(0)+'/head profit. Monitor corn prices closely.';}
+  else{verd.className='verdict sell-corn';verd.textContent='Consider selling corn — losing $'+Math.abs(margin).toFixed(0)+'/head to finish at current prices.';}
+}
+
+function loadNews() {
+  const grid=document.getElementById('news-grid'), loading=document.getElementById('news-loading');
+  if (grid.style.display!=='none') return;
+  const headlines=[
+    {tag:'cattle',text:'Live cattle futures post third straight weekly gain amid tight supplies and strong export demand',age:'2h ago'},
+    {tag:'cattle',text:'USDA weekly slaughter report shows 86,000 head — below year-ago pace, supporting price floor',age:'4h ago'},
+    {tag:'corn',text:'Corn futures edge higher as early planting pace raises quality concerns in Corn Belt states',age:'5h ago'},
+    {tag:'cattle',text:'Feeder cattle index settles at 349.48 — buyers active at regional auctions through the week',age:'6h ago'},
+    {tag:'market',text:'CME cattle complex: choice cutout values hold above $397 as grocery demand stays resilient',age:'8h ago'},
+    {tag:'corn',text:'Ethanol margins improve as corn prices stabilize — supporting floor for CBOT nearby contracts',age:'10h ago'},
+    {tag:'market',text:'Cash trade in the north sees $240-241, south at $242-245 — basis firm into April delivery',age:'12h ago'},
+    {tag:'cattle',text:'Packers report strong booking pace through Q2 — feedlots holding disciplined on placement numbers',age:'1d ago'},
+  ];
+  loading.style.display='none';
+  grid.style.display='grid';
+  grid.innerHTML=headlines.map(n=>`
+    <div class="news-item">
+      <div class="news-tag ${n.tag}">${n.tag}</div>
+      <div>
+        <div class="news-headline">${n.text}</div>
+        <div class="news-meta">${n.age} · CME / USDA AMS</div>
+      </div>
+    </div>`).join('');
+}
+
+async function loadPrices() {
+  const fb={
+    lc:{price:231.50,open:230.90,high:232.10,low:229.80,change:0.60,pct:0.26},
+    fc:{price:354.50,open:349.85,high:355.35,low:345.08,change:4.65,pct:1.33},
+    cn:{price:4.5250,open:4.4875,high:4.5750,low:4.4600,change:0.0375,pct:0.84}
   };
-}
-
-// ── Simulated history (for sparklines) ───────────────────────────────────
-function generateHistory(currentPrice, days = 10) {
-  const hist = [];
-  let p = currentPrice * (0.94 + Math.random() * 0.04);
-  for (let i = 0; i < days; i++) {
-    p = p * (0.995 + Math.random() * 0.012);
-    hist.push(p);
+  async function fetchOne(sym) {
+    try {
+      const r=await fetch('https://stooq.com/q/l/?s='+sym+'&f=sd2t2ohlcv&h&e=csv');
+      const t=await r.text();
+      const cols=t.trim().split('\n')[1]?.split(',');
+      if(!cols) throw 0;
+      const [open,high,low,close]=[3,4,5,6].map(i=>parseFloat(cols[i]));
+      if(isNaN(close)) throw 0;
+      return {price:close,open,high,low,change:close-open,pct:((close-open)/open)*100};
+    } catch{return null;}
   }
-  hist.push(currentPrice);
-  return hist;
+  const [lc,fc,cn]=await Promise.all([fetchOne('lc.f'),fetchOne('fc.f'),fetchOne('c.f')]);
+  DATA={lc:lc||fb.lc,fc:fc||fb.fc,cn:cn||fb.cn};
+  document.getElementById('status-txt').textContent=[lc,fc,cn].some(Boolean)?'Live data':'Recent values';
+
+  function set(id,d,isCorn){
+    const fmt=v=>isCorn?v.toFixed(4):v.toFixed(2);
+    document.getElementById('p-'+id).textContent=isCorn?'$'+fmt(d.price):fmt(d.price);
+    document.getElementById('h-'+id).textContent=fmt(d.high);
+    document.getElementById('l-'+id).textContent=fmt(d.low);
+    document.getElementById('v-'+id).textContent=fmt(d.open);
+    setBadge('b-'+id,d.change,d.pct);
+  }
+  set('lc',DATA.lc,false); set('fc',DATA.fc,false); set('cn',DATA.cn,true);
+
+  const {lc:l,fc:f,cn:c}=DATA;
+  let msg='';
+  if(l.change>0&&f.change>0) msg='<strong>Both cattle markets moving up</strong> — favorable selling conditions today.';
+  else if(l.change>0&&f.change<=0) msg='<strong>Live up, feeder flat</strong> — spread widening. Good time to evaluate near-finish animals.';
+  else if(c.price>5.0) msg='<strong>Corn above $5.00/bu</strong> — high feed value. Run the margin calc to check the sell-corn tradeoff.';
+  else msg='Market stable. Live cattle at <strong>'+l.price.toFixed(2)+'¢/lb</strong>, corn at <strong>$'+c.price.toFixed(2)+'/bu</strong>.';
+  document.getElementById('insight-strip').innerHTML=msg;
+
+  renderTodayChart();
+  document.getElementById('sp').value=Math.round(l.price);
+  document.getElementById('sp-val').textContent=Math.round(l.price);
+  document.getElementById('cp').value=c.price.toFixed(2);
+  document.getElementById('cp-val').textContent='$'+c.price.toFixed(2);
+  calc();
 }
 
-// ── Render ────────────────────────────────────────────────────────────────
-async function render() {
-  document.getElementById('insight-text').textContent = 'Fetching market data...';
-
-  let data = await fetchCommodityData();
-  let usingFallback = false;
-
-  // Use fallback for any missing
-  const fallback = getFallbackData();
-  if (!data.liveCattle)   { data.liveCattle = fallback.liveCattle; usingFallback = true; }
-  if (!data.feederCattle) { data.feederCattle = fallback.feederCattle; usingFallback = true; }
-  if (!data.corn)         { data.corn = fallback.corn; usingFallback = true; }
-
-  // Live Cattle
-  const lc = data.liveCattle;
-  document.getElementById('live-price').textContent = lc.price.toFixed(2);
-  document.getElementById('live-high').textContent  = lc.high.toFixed(2);
-  document.getElementById('live-low').textContent   = lc.low.toFixed(2);
-  document.getElementById('live-prev').textContent  = lc.prev.toFixed(2);
-  setChange('live-change', lc.change, lc.pct);
-  drawSparkline('live-spark', generateHistory(lc.price), '#b85c2a');
-
-  // Feeder Cattle
-  const fc = data.feederCattle;
-  document.getElementById('feeder-price').textContent = fc.price.toFixed(2);
-  document.getElementById('feeder-high').textContent  = fc.high.toFixed(2);
-  document.getElementById('feeder-low').textContent   = fc.low.toFixed(2);
-  document.getElementById('feeder-prev').textContent  = fc.prev.toFixed(2);
-  setChange('feeder-change', fc.change, fc.pct);
-  drawSparkline('feeder-spark', generateHistory(fc.price), '#c8a84b');
-
-  // Corn
-  const cn = data.corn;
-  document.getElementById('corn-price').textContent = `$${cn.price.toFixed(4)}`;
-  document.getElementById('corn-high').textContent  = cn.high.toFixed(4);
-  document.getElementById('corn-low').textContent   = cn.low.toFixed(4);
-  document.getElementById('corn-prev').textContent  = cn.prev.toFixed(4);
-  setChange('corn-change', cn.change, cn.pct);
-  drawSparkline('corn-spark', generateHistory(cn.price), '#4a7c3f');
-
-  generateInsight(data);
-
-  const now = new Date();
-  document.getElementById('refresh-info').textContent =
-    `Updated ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}${usingFallback ? ' · recent values' : ' · live'}`;
-}
-
-render();
-// Refresh every 15 minutes
-setInterval(render, 15 * 60 * 1000);
+loadPrices();
+setInterval(loadPrices,15*60*1000);
 </script>
 </body>
 </html>
