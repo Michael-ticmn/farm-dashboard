@@ -6,123 +6,154 @@
 <title>Farm Market Dashboard</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Georgia, serif; background: #13110d; color: #ddd0a8; min-height: 100vh; font-size: 15px; }
-  .topbar { background: #1e1a10; border-bottom: 1px solid #352d18; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; }
-  .brand { font-size: 17px; font-weight: 600; letter-spacing: 2px; color: #d4a84b; text-transform: uppercase; }
-  .brand span { color: #7a8060; font-size: 12px; margin-left: 12px; font-family: monospace; }
-  .clock-bar { font-family: monospace; font-size: 13px; color: #7a8060; display: flex; gap: 20px; align-items: center; }
-  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #5a9050; margin-right: 7px; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
-  .tabs { display: flex; border-bottom: 1px solid #352d18; background: #181410; padding: 0 28px; }
-  .tab { padding: 12px 22px; font-size: 13px; letter-spacing: 1px; color: #7a8060; cursor: pointer; border-bottom: 2px solid transparent; font-family: monospace; text-transform: uppercase; transition: all .15s; user-select: none; }
-  .tab.active { color: #d4a84b; border-bottom-color: #d4a84b; }
-  .tab:hover:not(.active) { color: #b09050; }
-  .content { padding: 22px 28px; }
+  body { font-family: Georgia, serif; background: #13110d; color: #ede0b8; min-height: 100vh; font-size: 17px; line-height: 1.6; }
+  .topbar { background: #1e1a10; border-bottom: 1px solid #4a3d20; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-size: 19px; font-weight: 600; letter-spacing: 2px; color: #e0b84b; text-transform: uppercase; }
+  .brand span { color: #8a9070; font-size: 13px; margin-left: 12px; font-family: monospace; }
+  .clock-bar { font-family: monospace; font-size: 14px; color: #8a9070; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .clock-time { font-size: 20px; color: #ede0b8; font-weight: 600; letter-spacing: 1px; }
+  .clock-date { font-size: 12px; color: #8a9070; letter-spacing: 0.5px; }
+  .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #6aaa60; margin-right: 7px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .tabs { display: flex; border-bottom: 1px solid #4a3d20; background: #181410; padding: 0 28px; }
+  .tab { padding: 13px 24px; font-size: 14px; letter-spacing: 1px; color: #8a9070; cursor: pointer; border-bottom: 2px solid transparent; font-family: monospace; text-transform: uppercase; transition: all .15s; user-select: none; }
+  .tab.active { color: #e0b84b; border-bottom-color: #e0b84b; }
+  .tab:hover:not(.active) { color: #c0a060; }
+  .content { padding: 24px 28px; }
   .section { display: none; }
   .section.active { display: block; }
-  .insight-strip { background: rgba(212,168,75,.07); border: 1px solid rgba(212,168,75,.18); border-radius: 5px; padding: 12px 18px; margin-bottom: 18px; font-family: monospace; font-size: 13px; color: #b09a70; line-height: 1.6; }
-  .insight-strip strong { color: #d4a84b; }
-  .cards { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-bottom: 20px; }
-  .card { background: #1e1a10; border: 1px solid #352d18; border-radius: 5px; padding: 18px; position: relative; overflow: hidden; }
+  .insight-strip { background: rgba(224,184,75,.09); border: 1px solid rgba(224,184,75,.3); border-radius: 5px; padding: 14px 20px; margin-bottom: 20px; font-family: monospace; font-size: 14px; color: #c8b070; line-height: 1.7; }
+  .insight-strip strong { color: #e0b84b; }
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; margin-bottom: 22px; }
+  .card { background: #231e12; border: 1px solid #4a3d20; border-radius: 5px; padding: 20px; position: relative; overflow: hidden; }
   .card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; }
-  .card.lc::before { background: #c07858; }
-  .card.fc::before { background: #d4a84b; }
-  .card.cn::before { background: #5a9050; }
-  .card-label { font-family: monospace; font-size: 10px; letter-spacing: 3px; color: #7a8060; margin-bottom: 5px; }
-  .card-name { font-size: 15px; color: #ddd0a8; margin-bottom: 10px; }
-  .card-price { font-family: monospace; font-size: 40px; font-weight: 600; line-height: 1; }
-  .card.lc .card-price { color: #c87858; }
-  .card.fc .card-price { color: #d4a84b; }
-  .card.cn .card-price { color: #72b862; }
-  .card-unit { font-family: monospace; font-size: 11px; color: #7a8060; margin: 6px 0 10px; }
-  .badge { display:inline-flex; align-items:center; gap:4px; font-family:monospace; font-size:12px; padding:3px 9px; border-radius:3px; }
-  .badge.up { background:rgba(90,144,80,.18); color:#72b862; }
-  .badge.down { background:rgba(192,120,88,.18); color:#c87858; }
-  .badge.flat { background:rgba(212,168,75,.12); color:#d4a84b; }
-  .card-meta { display:flex; justify-content:space-between; margin-top:12px; padding-top:12px; border-top:1px solid #2a2418; }
-  .meta-item { font-family:monospace; font-size:11px; color:#7a8060; }
-  .meta-item strong { display:block; color:#b09a70; font-size:13px; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .panel { background: #1e1a10; border: 1px solid #352d18; border-radius: 5px; padding: 18px; }
+  .card.lc::before { background: #d08868; }
+  .card.fc::before { background: #e0b84b; }
+  .card.cn::before { background: #6aaa60; }
+  .card-label { font-family: monospace; font-size: 11px; letter-spacing: 3px; color: #8a9070; margin-bottom: 6px; }
+  .card-name { font-size: 17px; color: #ede0b8; margin-bottom: 10px; }
+  .card-price { font-family: monospace; font-size: 44px; font-weight: 600; line-height: 1; color: #ede0b8; }
+  .card-unit { font-family: monospace; font-size: 12px; color: #8a9070; margin: 7px 0 11px; }
+  .badge { display:inline-flex; align-items:center; gap:5px; font-family:monospace; font-size:13px; padding:4px 10px; border-radius:3px; }
+  .badge.up { background:rgba(106,170,96,.2); color:#7acc6e; }
+  .badge.down { background:rgba(208,136,104,.2); color:#d89070; }
+  .badge.flat { background:rgba(224,184,75,.14); color:#e0b84b; }
+  .card-meta { display:flex; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid #332a14; }
+  .meta-item { font-family:monospace; font-size:12px; color:#8a9070; }
+  .meta-item strong { display:block; color:#c8b070; font-size:14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .panel { background: #231e12; border: 1px solid #4a3d20; border-radius: 5px; padding: 20px; }
   .panel.full { grid-column: 1 / -1; }
-  .panel-title { font-family: monospace; font-size: 10px; letter-spacing: 3px; color: #7a8060; margin-bottom: 14px; text-transform: uppercase; }
-  .weather-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-  .wx-item { background:#181410; border:1px solid #2a2418; border-radius:4px; padding:12px 10px; text-align:center; }
-  .wx-city { font-family:monospace; font-size:10px; color:#7a8060; letter-spacing:2px; margin-bottom:6px; }
-  .wx-temp { font-size:24px; color:#ddd0a8; font-weight:600; margin-bottom:4px; }
-  .wx-cond { font-family:monospace; font-size:11px; color:#9a9070; }
-  .wx-note { font-family:monospace; font-size:10px; color:#7a8060; margin-top:6px; padding-top:6px; border-top:1px solid #2a2418; }
-  .cal-item { display:flex; gap:14px; align-items:flex-start; padding:10px 0; border-bottom:1px solid #2a2418; }
+  .panel-title { font-family: monospace; font-size: 11px; letter-spacing: 3px; color: #8a9070; margin-bottom: 16px; text-transform: uppercase; }
+  .weather-row { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  .wx-item { background:#181410; border:1px solid #332a14; border-radius:4px; padding:10px 8px; text-align:center; }
+  .wx-city { font-family:monospace; font-size:10px; color:#8a9070; letter-spacing:2px; margin-bottom:5px; }
+  .wx-temp { font-size:22px; color:#ede0b8; font-weight:600; margin-bottom:3px; }
+  .wx-cond { font-family:monospace; font-size:11px; color:#aaa080; }
+  .wx-note { font-family:monospace; font-size:11px; color:#8a9070; margin-top:5px; padding-top:5px; border-top:1px solid #332a14; }
+  .cal-item { display:flex; gap:16px; align-items:flex-start; padding:12px 0; border-bottom:1px solid #332a14; }
   .cal-item:last-child { border-bottom:none; }
-  .cal-date { font-family:monospace; font-size:12px; color:#7a8060; min-width:70px; padding-top:2px; }
-  .cal-tag { font-family:monospace; font-size:9px; letter-spacing:2px; padding:2px 7px; border-radius:2px; flex-shrink:0; display:inline-block; margin-bottom:4px; }
-  .cal-tag.usda { background:rgba(90,144,80,.15); color:#72b862; }
-  .cal-tag.cme { background:rgba(212,168,75,.12); color:#d4a84b; }
-  .cal-text { font-size:13px; color:#c0b080; line-height:1.4; }
-  .cal-sub { font-family:monospace; font-size:11px; color:#7a8060; margin-top:2px; }
-  .hist-controls { display:flex; gap:8px; margin-bottom:16px; }
-  .hist-btn { font-family:monospace; font-size:11px; padding:5px 12px; border:1px solid #352d18; border-radius:3px; background:transparent; color:#7a8060; cursor:pointer; transition:all .15s; }
-  .hist-btn.active { border-color:#d4a84b; color:#d4a84b; background:rgba(212,168,75,.09); }
-  .field { margin-bottom:16px; }
-  .field label { font-family:monospace; font-size:12px; color:#9a9070; display:flex; justify-content:space-between; margin-bottom:5px; }
-  .field-val { color:#d4a84b; font-size:13px; }
-  .field input[type=range] { width:100%; accent-color:#d4a84b; cursor:pointer; }
-  .result-box { background:#131108; border:1px solid #2a2418; border-radius:5px; padding:16px; margin-top:16px; }
-  .result-row { display:flex; justify-content:space-between; font-family:monospace; font-size:13px; color:#9a9070; padding:5px 0; border-bottom:1px solid #1e1a10; }
+  .cal-date { font-family:monospace; font-size:13px; color:#8a9070; min-width:72px; padding-top:2px; }
+  .cal-tag { font-family:monospace; font-size:10px; letter-spacing:2px; padding:3px 8px; border-radius:2px; flex-shrink:0; display:inline-block; margin-bottom:5px; }
+  .cal-tag.usda { background:rgba(106,170,96,.18); color:#7acc6e; }
+  .cal-tag.cme { background:rgba(224,184,75,.15); color:#e0b84b; }
+  .cal-text { font-size:15px; color:#c8b888; line-height:1.5; }
+  .cal-sub { font-family:monospace; font-size:12px; color:#8a9070; margin-top:3px; }
+  .hist-controls { display:flex; gap:8px; margin-bottom:18px; }
+  .hist-btn { font-family:monospace; font-size:13px; padding:6px 14px; border:1px solid #4a3d20; border-radius:3px; background:transparent; color:#8a9070; cursor:pointer; transition:all .15s; }
+  .hist-btn.active { border-color:#e0b84b; color:#e0b84b; background:rgba(224,184,75,.1); }
+  .field { margin-bottom:18px; }
+  .field label { font-family:monospace; font-size:13px; color:#aaa888; display:flex; justify-content:space-between; margin-bottom:6px; }
+  .field-val { color:#e0b84b; font-size:14px; }
+  .field input[type=range] { width:100%; accent-color:#e0b84b; cursor:pointer; }
+  .result-box { background:#131008; border:1px solid #332a14; border-radius:5px; padding:18px; margin-top:18px; }
+  .result-row { display:flex; justify-content:space-between; font-family:monospace; font-size:14px; color:#aaa080; padding:7px 0; border-bottom:1px solid #231e12; }
   .result-row:last-child { border-bottom:none; }
-  .result-row.total { color:#d4a84b; font-size:15px; padding-top:8px; }
-  .result-row.profit { color:#72b862; }
-  .result-row.loss { color:#c87858; }
-  .verdict { text-align:center; padding:14px; margin-top:14px; border-radius:5px; font-family:monospace; font-size:13px; line-height:1.6; }
-  .verdict.sell-corn { background:rgba(90,144,80,.1); border:1px solid rgba(90,144,80,.3); color:#72b862; }
-  .verdict.feed-steer { background:rgba(212,168,75,.1); border:1px solid rgba(212,168,75,.3); color:#d4a84b; }
-  .verdict.neutral { background:rgba(138,130,90,.1); border:1px solid #352d18; color:#9a9070; }
-  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-  .stat-box { background:#131108; border:1px solid #2a2418; border-radius:4px; padding:12px; }
-  .stat-label { font-family:monospace; font-size:10px; letter-spacing:2px; color:#7a8060; margin-bottom:5px; }
-  .stat-val { font-size:22px; color:#d4a84b; font-family:monospace; font-weight:600; }
-  .stat-sub { font-family:monospace; font-size:10px; color:#7a8060; margin-top:3px; }
-  .herd-input { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-  .herd-input label { font-family:monospace; font-size:12px; color:#9a9070; }
-  .herd-input input[type=number] { background:#131108; border:1px solid #352d18; border-radius:3px; color:#d4a84b; font-family:monospace; font-size:15px; padding:5px 10px; width:90px; }
+  .result-row.total { color:#e0b84b; font-size:17px; padding-top:10px; }
+  .result-row.profit { color:#7acc6e; }
+  .result-row.loss { color:#d89070; }
+  .verdict { text-align:center; padding:16px; margin-top:16px; border-radius:5px; font-family:monospace; font-size:14px; line-height:1.7; }
+  .verdict.sell-corn { background:rgba(106,170,96,.12); border:1px solid rgba(106,170,96,.35); color:#7acc6e; }
+  .verdict.feed-steer { background:rgba(224,184,75,.12); border:1px solid rgba(224,184,75,.35); color:#e0b84b; }
+  .verdict.neutral { background:rgba(150,140,100,.1); border:1px solid #4a3d20; color:#aaa080; }
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+  .stat-box { background:#131008; border:1px solid #332a14; border-radius:4px; padding:14px; }
+  .stat-label { font-family:monospace; font-size:11px; letter-spacing:2px; color:#8a9070; margin-bottom:6px; }
+  .stat-val { font-size:24px; color:#e0b84b; font-family:monospace; font-weight:600; }
+  .stat-sub { font-family:monospace; font-size:12px; color:#8a9070; margin-top:4px; }
+  .herd-input { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .herd-input label { font-family:monospace; font-size:13px; color:#aaa888; }
+  .herd-input input[type=number] { background:#131008; border:1px solid #4a3d20; border-radius:3px; color:#e0b84b; font-family:monospace; font-size:17px; padding:6px 12px; width:100px; }
 
-  /* News mode toggle */
-  .news-toggle { display:flex; gap:0; margin-bottom:20px; border:1px solid #352d18; border-radius:5px; overflow:hidden; width:fit-content; }
-  .news-mode-btn { font-family:monospace; font-size:12px; letter-spacing:1px; padding:9px 20px; background:transparent; color:#7a8060; cursor:pointer; border:none; text-transform:uppercase; transition:all .15s; }
-  .news-mode-btn.active { background:#d4a84b; color:#13110d; font-weight:600; }
-  .news-mode-btn:not(.active):hover { background:rgba(212,168,75,.1); color:#d4a84b; }
+  /* News toggle */
+  .news-toggle { display:flex; gap:0; margin-bottom:22px; border:1px solid #4a3d20; border-radius:5px; overflow:hidden; width:fit-content; }
+  .news-mode-btn { font-family:monospace; font-size:13px; letter-spacing:1px; padding:10px 24px; background:transparent; color:#8a9070; cursor:pointer; border:none; text-transform:uppercase; transition:all .15s; }
+  .news-mode-btn.active { background:#e0b84b; color:#13110d; font-weight:600; }
+  .news-mode-btn:not(.active):hover { background:rgba(224,184,75,.12); color:#e0b84b; }
   .news-panel { display:none; }
   .news-panel.active { display:block; }
 
   /* Morning Brief */
-  .brief-grid { display:grid; gap:10px; }
-  .brief-item { background:#1e1a10; border:1px solid #352d18; border-radius:5px; padding:14px 18px; display:flex; gap:14px; align-items:flex-start; }
-  .brief-tag { font-family:monospace; font-size:9px; letter-spacing:2px; padding:3px 8px; border-radius:2px; flex-shrink:0; margin-top:2px; text-transform:uppercase; }
-  .brief-tag.cattle { background:rgba(192,120,88,.15); color:#c87858; }
-  .brief-tag.corn { background:rgba(90,144,80,.15); color:#72b862; }
-  .brief-tag.market { background:rgba(212,168,75,.12); color:#d4a84b; }
-  .brief-headline { font-size:14px; color:#ddd0a8; line-height:1.5; margin-bottom:4px; }
-  .brief-meta { font-family:monospace; font-size:11px; color:#7a8060; }
-  .brief-note { font-family:monospace; font-size:11px; color:#9a9070; margin-top:6px; padding-top:6px; border-top:1px solid #2a2418; font-style:italic; line-height:1.5; }
+  .brief-grid { display:grid; gap:12px; }
+  .brief-item { background:#231e12; border:1px solid #4a3d20; border-radius:5px; padding:18px 20px; display:flex; gap:16px; align-items:flex-start; }
+  .brief-tag { font-family:monospace; font-size:10px; letter-spacing:2px; padding:3px 9px; border-radius:2px; flex-shrink:0; margin-top:3px; text-transform:uppercase; }
+  .brief-tag.cattle { background:rgba(208,136,104,.18); color:#d89070; }
+  .brief-tag.corn { background:rgba(106,170,96,.18); color:#7acc6e; }
+  .brief-tag.market { background:rgba(224,184,75,.14); color:#e0b84b; }
+  .brief-headline { font-size:16px; color:#ede0b8; line-height:1.5; margin-bottom:5px; }
+  .brief-meta { font-family:monospace; font-size:12px; color:#8a9070; margin-bottom:8px; }
+  .brief-note { font-family:monospace; font-size:13px; color:#aaa880; padding:10px 12px; background:#181410; border-left:2px solid #4a3d20; border-radius:0 3px 3px 0; line-height:1.6; }
+  .brief-note strong { color:#c8b070; }
 
   /* From the Source */
-  .source-grid { display:grid; gap:10px; }
-  .source-item { background:#1e1a10; border:1px solid #352d18; border-radius:5px; padding:14px 18px; display:flex; gap:14px; align-items:flex-start; transition:border-color .15s; }
-  .source-item:hover { border-color:#d4a84b44; }
-  .source-item a { text-decoration:none; color:inherit; display:flex; gap:14px; width:100%; }
-  .source-tag { font-family:monospace; font-size:9px; letter-spacing:2px; padding:3px 8px; border-radius:2px; flex-shrink:0; margin-top:2px; text-transform:uppercase; }
-  .source-tag.usda { background:rgba(90,144,80,.15); color:#72b862; }
-  .source-tag.dtn { background:rgba(212,168,75,.12); color:#d4a84b; }
-  .source-tag.drovers { background:rgba(192,120,88,.15); color:#c87858; }
-  .source-tag.fb { background:rgba(138,130,90,.15); color:#9a9070; }
-  .source-headline { font-size:14px; color:#ddd0a8; line-height:1.5; margin-bottom:4px; }
-  .source-headline:hover { color:#d4a84b; }
-  .source-meta { font-family:monospace; font-size:11px; color:#7a8060; }
-  .source-arrow { margin-left:auto; color:#7a8060; font-size:14px; flex-shrink:0; padding-top:2px; align-self:center; }
-  .source-loading { font-family:monospace; font-size:12px; color:#7a8060; text-align:center; padding:30px; }
-  .source-error { font-family:monospace; font-size:12px; color:#9a7060; text-align:center; padding:20px; line-height:1.8; }
+  .source-intro { font-family:monospace; font-size:13px; color:#8a9070; margin-bottom:20px; line-height:1.7; border:1px solid #332a14; border-radius:5px; padding:14px 18px; background:#181410; }
+  .source-section { margin-bottom:28px; }
+  .source-section-title { font-family:monospace; font-size:11px; letter-spacing:3px; color:#8a9070; text-transform:uppercase; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #332a14; }
+  .source-links { display:grid; gap:10px; }
+  .source-link { display:flex; align-items:center; gap:16px; background:#231e12; border:1px solid #4a3d20; border-radius:5px; padding:16px 20px; text-decoration:none; color:inherit; transition:border-color .15s; }
+  .source-link:hover { border-color:#e0b84b88; }
+  .source-link:hover .source-link-title { color:#e0b84b; }
+  .source-link-icon { width:38px; height:38px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .source-link-icon.usda { background:rgba(106,170,96,.15); }
+  .source-link-icon.cattle { background:rgba(208,136,104,.15); }
+  .source-link-icon.grain { background:rgba(224,184,75,.12); }
+  .source-link-icon.general { background:rgba(150,140,100,.12); }
+  .source-link-body { flex:1; }
+  .source-link-title { font-size:15px; color:#ede0b8; font-weight:600; margin-bottom:3px; transition:color .15s; }
+  .source-link-desc { font-family:monospace; font-size:12px; color:#8a9070; line-height:1.5; }
+  .source-link-tag { font-family:monospace; font-size:10px; letter-spacing:2px; padding:2px 8px; border-radius:2px; margin-left:auto; flex-shrink:0; align-self:center; }
+  .source-link-tag.free { background:rgba(106,170,96,.15); color:#7acc6e; }
+  .source-link-tag.gov { background:rgba(106,170,96,.22); color:#7acc6e; }
+  .source-link-arrow { font-size:18px; color:#4a3d20; margin-left:8px; }
+
+  /* Auction tab */
+  .hm-loc { display:block; background:#131008; border:1px solid #4a3d20; border-radius:4px; padding:14px 16px; text-decoration:none; transition:border-color .15s; }
+  .hm-loc:hover { border-color:#e0b84b88; }
+  .hm-loc-name { font-size:15px; color:#ede0b8; font-weight:600; margin-bottom:4px; }
+  .hm-loc-addr { font-family:monospace; font-size:12px; color:#8a9070; margin-bottom:3px; }
+  .hm-loc-dist { font-family:monospace; font-size:11px; color:#6a7858; }
+  .auction-item { padding:14px 0; border-bottom:1px solid #332a14; }
+  .auction-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; gap:10px; }
+  .auction-name { font-size:16px; color:#ede0b8; font-weight:600; }
+  .auction-freq { font-family:monospace; font-size:11px; color:#e0b84b; background:rgba(224,184,75,.12); padding:2px 9px; border-radius:3px; white-space:nowrap; flex-shrink:0; }
+  .auction-detail { font-family:monospace; font-size:12px; color:#8a9070; margin-bottom:3px; line-height:1.5; }
+  .auction-links { display:flex; gap:10px; margin-top:8px; }
+  .auction-link { font-family:monospace; font-size:12px; color:#7acc6e; text-decoration:none; border:1px solid rgba(122,204,110,.25); padding:3px 10px; border-radius:3px; transition:all .15s; }
+  .auction-link:hover { background:rgba(122,204,110,.1); }
 
   @media(max-width:800px){ .cards,.two-col,.weather-row{ grid-template-columns:1fr; } .panel.full{ grid-column:1; } }
+
+  /* User Guide */
+  .guide-section { margin-bottom:14px; }
+  .guide-section:last-of-type { margin-bottom:0; }
+  .guide-heading { font-family:monospace; font-size:11px; letter-spacing:2px; color:#8a9070; text-transform:uppercase; margin-bottom:8px; padding-bottom:5px; border-bottom:1px solid #332a14; }
+  .guide-row { display:flex; align-items:flex-start; gap:12px; margin-bottom:7px; font-size:13px; color:#aaa880; line-height:1.5; }
+  .guide-badge { font-family:monospace; font-size:11px; padding:2px 8px; border-radius:3px; flex-shrink:0; white-space:nowrap; }
+  .guide-badge.up-ex { background:rgba(106,170,96,.2); color:#7acc6e; }
+  .guide-badge.down-ex { background:rgba(208,136,104,.2); color:#d89070; }
+  .guide-badge.flat-ex { background:rgba(224,184,75,.14); color:#e0b84b; }
+  .guide-label { font-family:monospace; font-size:12px; color:#c8b070; flex-shrink:0; min-width:90px; padding-top:1px; }
+  .guide-desc { color:#aaa880; font-size:13px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -130,7 +161,8 @@
   <div class="brand">Farm Market <span>DASHBOARD</span></div>
   <div class="clock-bar">
     <span><span class="status-dot"></span><span id="status-txt">Loading...</span></span>
-    <span id="clock-txt">--:--</span>
+    <div class="clock-time" id="clock-txt">--:-- --</div>
+    <div class="clock-date" id="clock-date">--- --, ----</div>
   </div>
 </div>
 <div class="tabs">
@@ -138,6 +170,8 @@
   <div class="tab" onclick="switchTab('charts')">Charts</div>
   <div class="tab" onclick="switchTab('margin')">Margin Calc</div>
   <div class="tab" onclick="switchTab('news')">Market News</div>
+  <div class="tab" onclick="switchTab('barns')">Auction Barns</div>
+  <div class="tab" onclick="switchTab('lockers')">Meat Lockers</div>
 </div>
 <div class="content">
 
@@ -183,13 +217,44 @@
       </div>
     </div>
     <div class="two-col">
-      <div class="panel">
-        <div class="panel-title">Midwest growing conditions — corn belt</div>
-        <div class="weather-row">
-          <div class="wx-item"><div class="wx-city">AMES IA</div><div class="wx-temp" id="wx-1">—</div><div class="wx-cond" id="wc-1">—</div><div class="wx-note" id="wn-1">—</div></div>
-          <div class="wx-item"><div class="wx-city">PEORIA IL</div><div class="wx-temp" id="wx-2">—</div><div class="wx-cond" id="wc-2">—</div><div class="wx-note" id="wn-2">—</div></div>
-          <div class="wx-item"><div class="wx-city">COLUMBUS OH</div><div class="wx-temp" id="wx-3">—</div><div class="wx-cond" id="wc-3">—</div><div class="wx-note" id="wn-3">—</div></div>
-          <div class="wx-item"><div class="wx-city">OMAHA NE</div><div class="wx-temp" id="wx-4">—</div><div class="wx-cond" id="wc-4">—</div><div class="wx-note" id="wn-4">—</div></div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <!-- Weather — compact -->
+        <div class="panel" style="padding:14px 18px;">
+          <div class="panel-title">Midwest conditions — corn belt</div>
+          <div class="weather-row">
+            <div class="wx-item"><div class="wx-city" id="wx-city-1">—</div><div class="wx-temp" id="wx-1">—</div><div class="wx-cond" id="wc-1">—</div><div class="wx-note" id="wn-1">—</div></div>
+            <div class="wx-item"><div class="wx-city" id="wx-city-2">—</div><div class="wx-temp" id="wx-2">—</div><div class="wx-cond" id="wc-2">—</div><div class="wx-note" id="wn-2">—</div></div>
+            <div class="wx-item"><div class="wx-city" id="wx-city-3">—</div><div class="wx-temp" id="wx-3">—</div><div class="wx-cond" id="wc-3">—</div><div class="wx-note" id="wn-3">—</div></div>
+            <div class="wx-item"><div class="wx-city" id="wx-city-4">—</div><div class="wx-temp" id="wx-4">—</div><div class="wx-cond" id="wc-4">—</div><div class="wx-note" id="wn-4">—</div></div>
+            <div class="wx-item"><div class="wx-city" id="wx-city-5">YOUR LOCATION</div><div class="wx-temp" id="wx-5">—</div><div class="wx-cond" id="wc-5">—</div><div class="wx-note" id="wn-5">—</div></div>
+          </div>
+        </div>
+        <!-- User Guide -->
+        <div class="panel">
+          <div class="panel-title">User guide — how to use this dashboard</div>
+          <div class="guide-section">
+            <div class="guide-heading">Price Colors</div>
+            <div class="guide-row"><span class="guide-badge up-ex">Green</span><span class="guide-desc">Price is up from yesterday's close — good selling signal</span></div>
+            <div class="guide-row"><span class="guide-badge down-ex">Red / Orange</span><span class="guide-desc">Price is down from yesterday's close — monitor closely</span></div>
+            <div class="guide-row"><span class="guide-badge flat-ex">Amber</span><span class="guide-desc">Price is flat — little change from yesterday</span></div>
+            <div class="guide-row" style="margin-top:4px;"><span class="guide-desc" style="color:#8a9070;font-size:12px;">Both the large price number and the badge below it reflect today's direction. Colors reset each morning at market open.</span></div>
+          </div>
+          <div class="guide-section">
+            <div class="guide-heading">Tabs</div>
+            <div class="guide-row"><span class="guide-label">Prices</span><span class="guide-desc">Live market prices, weather, and upcoming USDA reports</span></div>
+            <div class="guide-row"><span class="guide-label">Charts</span><span class="guide-desc">Historical price trends — use 90D or 180D for context on selling decisions</span></div>
+            <div class="guide-row"><span class="guide-label">Margin Calc</span><span class="guide-desc">Adjust sliders to model your actual operation — buy weight, feed cost, sell price. The verdict updates live.</span></div>
+            <div class="guide-row"><span class="guide-label">Market News</span><span class="guide-desc">Morning Brief is a curated daily summary. From the Source links to real articles at USDA, Drovers, and DTN.</span></div>
+          </div>
+          <div class="guide-section">
+            <div class="guide-heading">Key numbers to watch</div>
+            <div class="guide-row"><span class="guide-label">Live Cattle</span><span class="guide-desc">What the market pays for your finished steers (¢/lb)</span></div>
+            <div class="guide-row"><span class="guide-label">Feeder Cattle</span><span class="guide-desc">What incoming calves cost at auction (¢/lb)</span></div>
+            <div class="guide-row"><span class="guide-label">Corn</span><span class="guide-desc">Market value of your home-grown feed ($/bu) — affects both feed cost and sell-corn tradeoff</span></div>
+          </div>
+          <div style="font-family:monospace;font-size:11px;color:#6a7858;margin-top:12px;padding-top:10px;border-top:1px solid #332a14;">
+            Data refreshes automatically every 15 minutes. Weather updates every 30 minutes.
+          </div>
         </div>
       </div>
       <div class="panel">
@@ -206,28 +271,28 @@
   <!-- CHARTS -->
   <div class="section" id="tab-charts">
     <div class="hist-controls">
-      <button class="hist-btn active" onclick="setRange(7,this)">7D</button>
+      <button class="hist-btn" onclick="setRange(7,this)">7D</button>
       <button class="hist-btn" onclick="setRange(30,this)">30D</button>
-      <button class="hist-btn" onclick="setRange(90,this)">90D</button>
+      <button class="hist-btn active" onclick="setRange(90,this)">90D</button>
       <button class="hist-btn" onclick="setRange(180,this)">180D</button>
     </div>
-    <div class="panel full" style="margin-bottom:16px;">
+    <div class="panel full" style="margin-bottom:18px;">
       <div class="panel-title">Live cattle — historical price (¢/lb)</div>
-      <div style="position:relative;width:100%;height:200px;"><canvas id="hist-lc"></canvas></div>
+      <div style="position:relative;width:100%;height:210px;"><canvas id="hist-lc"></canvas></div>
     </div>
     <div class="two-col">
       <div class="panel">
         <div class="panel-title">Feeder cattle — historical (¢/lb)</div>
-        <div style="position:relative;width:100%;height:190px;"><canvas id="hist-fc"></canvas></div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="hist-fc"></canvas></div>
       </div>
       <div class="panel">
         <div class="panel-title">Corn — historical ($/bu)</div>
-        <div style="position:relative;width:100%;height:190px;"><canvas id="hist-cn"></canvas></div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="hist-cn"></canvas></div>
       </div>
     </div>
     <div class="panel full">
       <div class="panel-title">Live / feeder spread — margin indicator (¢/lb)</div>
-      <div style="position:relative;width:100%;height:160px;"><canvas id="hist-spread"></canvas></div>
+      <div style="position:relative;width:100%;height:170px;"><canvas id="hist-spread"></canvas></div>
     </div>
   </div>
 
@@ -242,18 +307,18 @@
         <div class="field"><label>Days on feed <span class="field-val" id="dof-val">180</span></label><input type="range" min="60" max="400" value="180" step="5" oninput="calc();document.getElementById('dof-val').textContent=this.value" id="dof"></div>
         <div class="field"><label>Corn fed (bu/day/head) <span class="field-val" id="cf-val">0.25</span></label><input type="range" min="0.1" max="1.0" value="0.25" step="0.05" oninput="calc();document.getElementById('cf-val').textContent=parseFloat(this.value).toFixed(2)" id="cf"></div>
         <div class="field"><label>Other costs ($/day/head) <span class="field-val" id="oc-val">$1.50</span></label><input type="range" min="0.5" max="5" value="1.5" step="0.25" oninput="calc();document.getElementById('oc-val').textContent='$'+parseFloat(this.value).toFixed(2)" id="oc"></div>
-        <div class="field" style="border-top:1px solid #2a2418;padding-top:14px;margin-top:4px;">
+        <div class="field" style="border-top:1px solid #332a14;padding-top:16px;margin-top:4px;">
           <label>Sell price — live cattle (¢/lb) <span class="field-val" id="sp-val">231</span></label>
           <input type="range" min="150" max="350" value="231" step="1" oninput="calc();document.getElementById('sp-val').textContent=this.value" id="sp">
         </div>
         <div class="field"><label>Corn market price ($/bu) <span class="field-val" id="cp-val">$4.53</span></label><input type="range" min="3.0" max="9.0" value="4.53" step="0.01" oninput="calc();document.getElementById('cp-val').textContent='$'+parseFloat(this.value).toFixed(2)" id="cp"></div>
-        <div class="panel" style="margin-top:6px;background:#131108;border-color:#2a2418;">
+        <div class="panel" style="margin-top:8px;background:#131008;border-color:#332a14;">
           <div class="panel-title">Seasonal price patterns — live cattle historical avg</div>
-          <div style="position:relative;width:100%;height:140px;"><canvas id="seasonal-chart"></canvas></div>
-          <div style="font-family:monospace;font-size:11px;color:#7a8060;margin-top:8px;">Cattle prices historically peak Mar–May and Oct–Nov. Current month highlighted in amber.</div>
+          <div style="position:relative;width:100%;height:150px;"><canvas id="seasonal-chart"></canvas></div>
+          <div style="font-family:monospace;font-size:12px;color:#8a9070;margin-top:10px;line-height:1.6;">Cattle prices historically peak Mar–May and Oct–Nov. Current month highlighted in amber.</div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
         <div class="panel">
           <div class="panel-title">Per head — results</div>
           <div class="result-box" style="margin-top:0;">
@@ -298,7 +363,7 @@
           <div>
             <div class="brief-headline">Live cattle futures post third straight weekly gain amid tight supplies and strong export demand</div>
             <div class="brief-meta">2h ago · CME</div>
-            <div class="brief-note">What it means for you: Selling conditions remain favorable. Animals near target weight should be prioritized for market — don't leave margin on the table waiting for more upside.</div>
+            <div class="brief-note"><strong>What it means for you:</strong> Selling conditions remain favorable. Animals near target weight should be prioritized — don't leave margin on the table waiting for more upside.</div>
           </div>
         </div>
         <div class="brief-item">
@@ -306,7 +371,7 @@
           <div>
             <div class="brief-headline">USDA weekly slaughter report shows 86,000 head — below year-ago pace, supporting the price floor</div>
             <div class="brief-meta">4h ago · USDA AMS</div>
-            <div class="brief-note">What it means for you: Tighter slaughter numbers mean packers are competing harder for cattle. This supports cash prices and reduces downside risk in the near term.</div>
+            <div class="brief-note"><strong>What it means for you:</strong> Tighter slaughter numbers mean packers are competing harder for cattle. This supports cash prices and reduces downside risk near term.</div>
           </div>
         </div>
         <div class="brief-item">
@@ -314,7 +379,7 @@
           <div>
             <div class="brief-headline">Corn futures edge higher as early planting pace raises quality concerns in Corn Belt states</div>
             <div class="brief-meta">5h ago · CBOT</div>
-            <div class="brief-note">What it means for you: Rising corn prices increase the opportunity cost of feeding vs. selling. Run the margin calc with current corn price to check your tradeoff.</div>
+            <div class="brief-note"><strong>What it means for you:</strong> Rising corn prices increase the opportunity cost of feeding vs. selling. Run the margin calc with the current corn price to check your tradeoff.</div>
           </div>
         </div>
         <div class="brief-item">
@@ -322,7 +387,7 @@
           <div>
             <div class="brief-headline">Feeder cattle index settles at 349.48 — buyers active at regional auctions through the week</div>
             <div class="brief-meta">6h ago · CME</div>
-            <div class="brief-note">What it means for you: Strong feeder demand means incoming calf costs remain elevated. Factor current feeder prices into buy decisions — your cost basis matters from day one.</div>
+            <div class="brief-note"><strong>What it means for you:</strong> Strong feeder demand means incoming calf costs remain elevated. Factor current feeder prices into buy decisions — your cost basis matters from day one.</div>
           </div>
         </div>
         <div class="brief-item">
@@ -330,7 +395,7 @@
           <div>
             <div class="brief-headline">CME cattle complex: choice cutout values hold above $397 as grocery demand stays resilient</div>
             <div class="brief-meta">8h ago · CME</div>
-            <div class="brief-note">What it means for you: Strong retail beef demand at the consumer level underpins packer willingness to pay — a positive signal for cash cattle prices heading into spring grilling season.</div>
+            <div class="brief-note"><strong>What it means for you:</strong> Strong retail beef demand underpins packer willingness to pay — a positive signal for cash cattle prices heading into spring grilling season.</div>
           </div>
         </div>
         <div class="brief-item">
@@ -338,7 +403,7 @@
           <div>
             <div class="brief-headline">Ethanol margins improve as corn prices stabilize — supporting a floor for CBOT nearby contracts</div>
             <div class="brief-meta">10h ago · DTN</div>
-            <div class="brief-note">What it means for you: Ethanol demand competes with feed use for corn — strong ethanol margins put a floor under corn prices. Budget accordingly for feed costs through Q2.</div>
+            <div class="brief-note"><strong>What it means for you:</strong> Ethanol demand competes with feed use for corn — strong ethanol margins put a floor under corn prices. Budget accordingly for feed costs through Q2.</div>
           </div>
         </div>
       </div>
@@ -346,27 +411,255 @@
 
     <!-- From the Source -->
     <div class="news-panel" id="panel-source">
-      <div class="source-loading" id="source-loading">Fetching live articles...</div>
-      <div class="source-grid" id="source-grid" style="display:none;"></div>
-      <div class="source-error" id="source-error" style="display:none;">
-        Unable to fetch live articles directly — RSS feeds require a server-side proxy to load in browsers.<br><br>
-        Visit these sources directly for live news:<br><br>
-        <a href="https://www.ams.usda.gov/market-news/cattle" target="_blank" style="color:#72b862;">USDA AMS Cattle Market News ↗</a><br>
-        <a href="https://www.drovers.com/cattle-news" target="_blank" style="color:#c87858;">Drovers — Cattle News ↗</a><br>
-        <a href="https://www.dtnpf.com/agriculture/web/ag/news" target="_blank" style="color:#d4a84b;">DTN Progressive Farmer ↗</a><br>
-        <a href="https://www.fb.org/newsroom" target="_blank" style="color:#9a9070;">American Farm Bureau ↗</a>
+      <div class="source-intro">
+        Live article feeds from trusted agricultural sources. Each link opens the full article in a new tab.
+        Bookmark this page and check From the Source daily for current market intelligence.
+      </div>
+
+      <div class="source-section">
+        <div class="source-section-title">Government &amp; Official Data</div>
+        <div class="source-links">
+          <a class="source-link" href="https://www.ams.usda.gov/market-news/cattle" target="_blank" rel="noopener">
+            <div class="source-link-icon usda">🐄</div>
+            <div class="source-link-body">
+              <div class="source-link-title">USDA AMS — Cattle Market News</div>
+              <div class="source-link-desc">Official daily and weekly cattle price reports, auction results, and slaughter data direct from USDA Agricultural Marketing Service</div>
+            </div>
+            <span class="source-link-tag gov">GOV</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+          <a class="source-link" href="https://www.ams.usda.gov/market-news/grain-and-feed" target="_blank" rel="noopener">
+            <div class="source-link-icon grain">🌽</div>
+            <div class="source-link-body">
+              <div class="source-link-title">USDA AMS — Grain &amp; Feed Market News</div>
+              <div class="source-link-desc">Official corn, feed grain, and hay price reports including local cash prices across the Corn Belt</div>
+            </div>
+            <span class="source-link-tag gov">GOV</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+          <a class="source-link" href="https://www.nass.usda.gov/Publications/Todays_Reports/" target="_blank" rel="noopener">
+            <div class="source-link-icon usda">📊</div>
+            <div class="source-link-body">
+              <div class="source-link-title">USDA NASS — Today's Reports</div>
+              <div class="source-link-desc">Cattle on Feed, WASDE, Grain Stocks, and all major USDA market-moving reports as they are released</div>
+            </div>
+            <span class="source-link-tag gov">GOV</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="source-section">
+        <div class="source-section-title">Cattle Industry News</div>
+        <div class="source-links">
+          <a class="source-link" href="https://www.drovers.com/cattle-news" target="_blank" rel="noopener">
+            <div class="source-link-icon cattle">📰</div>
+            <div class="source-link-body">
+              <div class="source-link-title">Drovers — Cattle News</div>
+              <div class="source-link-desc">Daily cattle industry news covering markets, management, policy, and industry trends — one of the most widely read beef cattle publications</div>
+            </div>
+            <span class="source-link-tag free">FREE</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+          <a class="source-link" href="https://www.beefmagazine.com/markets" target="_blank" rel="noopener">
+            <div class="source-link-icon cattle">📈</div>
+            <div class="source-link-body">
+              <div class="source-link-title">Beef Magazine — Markets</div>
+              <div class="source-link-desc">Market analysis, price outlooks, and commentary from cattle industry economists and market analysts</div>
+            </div>
+            <span class="source-link-tag free">FREE</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+          <a class="source-link" href="https://www.cattlenetwork.com" target="_blank" rel="noopener">
+            <div class="source-link-icon cattle">🐂</div>
+            <div class="source-link-body">
+              <div class="source-link-title">Cattle Network</div>
+              <div class="source-link-desc">News, market commentary, and management resources for beef cattle producers across all segments</div>
+            </div>
+            <span class="source-link-tag free">FREE</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="source-section">
+        <div class="source-section-title">Grain &amp; Commodity Markets</div>
+        <div class="source-links">
+          <a class="source-link" href="https://www.dtnpf.com/agriculture/web/ag/news" target="_blank" rel="noopener">
+            <div class="source-link-icon grain">🌾</div>
+            <div class="source-link-body">
+              <div class="source-link-title">DTN Progressive Farmer — News</div>
+              <div class="source-link-desc">Commodity market news, futures analysis, and weather coverage with a focus on grain and livestock producers</div>
+            </div>
+            <span class="source-link-tag free">FREE</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+          <a class="source-link" href="https://www.fb.org/newsroom" target="_blank" rel="noopener">
+            <div class="source-link-icon general">🏡</div>
+            <div class="source-link-body">
+              <div class="source-link-title">American Farm Bureau — Newsroom</div>
+              <div class="source-link-desc">Policy updates, market news, and resources covering all agricultural sectors including livestock and grain</div>
+            </div>
+            <span class="source-link-tag free">FREE</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+          <a class="source-link" href="https://www.cmegroup.com/markets/agricultural.html" target="_blank" rel="noopener">
+            <div class="source-link-icon grain">📉</div>
+            <div class="source-link-body">
+              <div class="source-link-title">CME Group — Agricultural Markets</div>
+              <div class="source-link-desc">Live futures quotes, contract specs, and settlement data for live cattle, feeder cattle, and corn directly from the exchange</div>
+            </div>
+            <span class="source-link-tag free">FREE</span>
+            <div class="source-link-arrow">↗</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCAL AUCTIONS -->
+  <!-- AUCTION BARNS -->
+  <div class="section" id="tab-barns">
+    <div class="insight-strip">
+      <strong>Livestock auction barns near your location</strong> — sorted by distance. All licensed by the Minnesota Board of Animal Health.
+    </div>
+    <div class="two-col">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Central Livestock Association</div><span class="auction-freq">Mon · Tue · Wed</span></div>
+          <div class="auction-detail">44326 County 6 Blvd, Zumbrota, MN · <strong style="color:#e0b84b;" id="dist-central">~35 miles</strong></div>
+          <div class="auction-detail">507-732-7305 · zumbrota-office@centrallivestock.com</div>
+          <div class="auction-detail" style="margin-top:6px;">Multiple sales weekly — feeder cattle, bred cow/heifer specials, market cows &amp; bulls. Mon/Tue start 8am, Wed 2pm. Online bidding via DVAuction.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://www.centrallivestock.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+            <a href="https://www.dvauction.com" target="_blank" rel="noopener" class="auction-link">DVAuction ↗</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Lanesboro Sales Commission</div><span class="auction-freq">Wed &amp; Fri</span></div>
+          <div class="auction-detail">402 Coffee St E, Lanesboro, MN · <strong style="color:#e0b84b;" id="dist-lanesboro">~60 miles</strong></div>
+          <div class="auction-detail">507-467-2192 · lanesborosalescommission@gmail.com</div>
+          <div class="auction-detail" style="margin-top:6px;">Wednesday 8:30am — market cows &amp; bulls, finished cattle. Friday 9am — baby calves, feeder cattle, dairy, sheep &amp; goats. Special feeder sales monthly. Live &amp; online via CattleUSA.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://www.lanesborosalescommission.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+            <a href="https://www.cattleusa.com" target="_blank" rel="noopener" class="auction-link">CattleUSA ↗</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Rock Creek Livestock Market</div><span class="auction-freq">Mon &amp; Wed</span></div>
+          <div class="auction-detail">Pine City, MN · <strong style="color:#e0b84b;" id="dist-rockcreek">~70 miles</strong></div>
+          <div class="auction-detail">Cattle, hogs, sheep &amp; goats — 8am. Feeder sales every other Tuesday. On-farm estimates, same day payment.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://rockcreeklivestockmarket.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Sleepy Eye Auction Market</div><span class="auction-freq">Every Wednesday</span></div>
+          <div class="auction-detail">Sleepy Eye, MN · <strong style="color:#e0b84b;" id="dist-sleepyeye">~90 miles</strong></div>
+          <div class="auction-detail">Family owned 75+ years. Sale 9am — feeder, finished, slaughter. Strong south central MN buyer network.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://sleepyeyeauctionmarket.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Pipestone Livestock Auction</div><span class="auction-freq">2nd &amp; 4th Thu</span></div>
+          <div class="auction-detail">Pipestone, MN · <strong style="color:#e0b84b;" id="dist-pipestone">~160 miles</strong></div>
+          <div class="auction-detail">Family owned 30+ years. Feeder cattle 11am, beef cattle noon. Online bidding via LMA Auctions — register early.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://www.pipestonelivestock.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+            <a href="https://lmaauctions.com" target="_blank" rel="noopener" class="auction-link">Bid Online ↗</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Online bidding platforms</div>
+          <div class="source-links">
+            <a class="source-link" href="https://www.dvauction.com" target="_blank" rel="noopener">
+              <div class="source-link-icon cattle">📡</div>
+              <div class="source-link-body"><div class="source-link-title">DVAuction</div><div class="source-link-desc">Used by Central Livestock Zumbrota — live video streaming and online bidding</div></div>
+              <div class="source-link-arrow">↗</div>
+            </a>
+            <a class="source-link" href="https://lmaauctions.com" target="_blank" rel="noopener">
+              <div class="source-link-icon cattle">🏷</div>
+              <div class="source-link-body"><div class="source-link-title">LMA Auctions</div><div class="source-link-desc">Used by Pipestone and other MN barns — pre-registration required, don't wait until sale day</div></div>
+              <div class="source-link-arrow">↗</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEAT LOCKERS -->
+  <div class="section" id="tab-lockers">
+    <div class="insight-strip">
+      <strong>Custom beef processing near your location</strong> — for direct-to-consumer and private butcher arrangements. Call ahead to schedule — most book out weeks in advance.
+    </div>
+    <div class="two-col">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="panel" style="border-color:#7acc6e44;">
+          <div style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#7acc6e;margin-bottom:6px;">IN FARIBAULT</div>
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Herda's Meat Processing</div><span class="auction-freq" style="background:rgba(122,204,110,.15);color:#7acc6e;">Faribault</span></div>
+          <div class="auction-detail"><strong style="color:#7acc6e;" id="dist-herdas">Calculating...</strong></div>
+          <div class="auction-detail" style="margin-top:6px;">Custom slaughter and processing in Faribault — used by local beef producers. Full custom cutting, grinding, vacuum packing. USDA-inspected facility. Call to schedule.</div>
+          <div class="auction-detail" style="margin-top:4px;color:#8a9070;">507-334-5555</div>
+        </div>
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Krenik's Meat Processing</div><span class="auction-freq">~15 miles</span></div>
+          <div class="auction-detail">Between Montgomery &amp; Shieldsville on County Rd 57 · <strong style="color:#e0b84b;" id="dist-kreniks">~15 miles</strong></div>
+          <div class="auction-detail" style="margin-top:6px;">Family owned since 1960. Custom beef and pork — cut one animal at a time, no comingling. Retail counter, specialty smoked products. Online scheduling portal.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://www.kreniks.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Lonsdale Country Market</div><span class="auction-freq">~20 miles</span></div>
+          <div class="auction-detail">Lonsdale, MN · <strong style="color:#e0b84b;" id="dist-lonsdale">~20 miles</strong></div>
+          <div class="auction-detail" style="margin-top:6px;">Custom butchering — beef, pork, lamb, deer &amp; wild game. Custom cuts, grinding, sausage, vacuum packing. Mon–Fri 10am–6pm, Sat 8:30am–3pm.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://www.lonsdalecountrymarket.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">Dennison Meat Locker</div><span class="auction-freq">~25 miles</span></div>
+          <div class="auction-detail">109 Farm Road, Dennison, MN · <strong style="color:#e0b84b;" id="dist-dennison">~25 miles</strong></div>
+          <div class="auction-detail" style="margin-top:6px;">Full custom beef processing — published pricing online, smoked sausages, retail counter. Mon–Fri 8am–5pm, Sat 8am–2pm. Serves Faribault and Northfield area.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://dennisonmeatlocker.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+            <a href="https://dennisonmeatlocker.com/custom-prices/beef-prices/" target="_blank" rel="noopener" class="auction-link">Beef Pricing ↗</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="auction-header" style="margin-bottom:8px;"><div class="auction-name">O'Keefe's Meat Market</div><span class="auction-freq">~30 miles</span></div>
+          <div class="auction-detail">Le Center, MN · <strong style="color:#e0b84b;" id="dist-okeefes">~30 miles</strong></div>
+          <div class="auction-detail" style="margin-top:6px;">Full-service custom slaughter and processing — retail counter, homemade sausage. Locally raised beef focus. Serves Faribault area. Call to schedule.</div>
+          <div class="auction-links" style="margin-top:10px;">
+            <a href="https://okeefesmeats.com" target="_blank" rel="noopener" class="auction-link">Website ↗</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Processing tips</div>
+          <div class="guide-row" style="margin-bottom:10px;"><span class="guide-label" style="min-width:110px;">Schedule early</span><span class="guide-desc">Most lockers book out weeks to months ahead — especially fall. Call as soon as you know your sell date.</span></div>
+          <div class="guide-row" style="margin-bottom:10px;"><span class="guide-label" style="min-width:110px;">Hanging weight</span><span class="guide-desc">Processing priced on hanging weight (after slaughter) — typically 60–65% of live weight</span></div>
+          <div class="guide-row" style="margin-bottom:10px;"><span class="guide-label" style="min-width:110px;">Cut sheet</span><span class="guide-desc">Provide a cut sheet specifying steaks, roasts, and ground beef ratios — do this before drop-off</span></div>
+          <div class="guide-row"><span class="guide-label" style="min-width:110px;">USDA inspect</span><span class="guide-desc">For retail sales (not direct farm), processor must be USDA-inspected — Herda's in Faribault qualifies</span></div>
+        </div>
       </div>
     </div>
   </div>
 
 </div>
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-let DATA={lc:null,fc:null,cn:null},histRange=7,charts={},sourceLoaded=false;
+let DATA={lc:null,fc:null,cn:null},histRange=90,charts={};
 
 function switchTab(id){
-  const ids=['prices','charts','margin','news'];
+  const ids=['prices','charts','margin','news','barns','lockers'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',ids[i]===id));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
@@ -374,15 +667,23 @@ function switchTab(id){
   if(id==='margin'){calc();renderSeasonal();}
 }
 
-function switchNews(mode, btn){
+function switchNews(mode,btn){
   document.querySelectorAll('.news-mode-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.querySelectorAll('.news-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+mode).classList.add('active');
-  if(mode==='source'&&!sourceLoaded) loadSource();
 }
 
-function clockTick(){const n=new Date();document.getElementById('clock-txt').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function clockTick(){
+  const n=new Date();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let h=n.getHours(),ampm=h>=12?'pm':'am';
+  h=h%12||12;
+  const m=String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('clock-txt').textContent=h+':'+m+' '+ampm;
+  document.getElementById('clock-date').textContent=days[n.getDay()]+' '+months[n.getMonth()]+' '+n.getDate()+', '+n.getFullYear();
+}
 clockTick();setInterval(clockTick,10000);
 
 function setBadge(id,change,pct){
@@ -391,6 +692,10 @@ function setBadge(id,change,pct){
   else if(change<-0.005){el.className='badge down';el.textContent='▼ −'+abs+' (−'+absPct+'%)';}
   else{el.className='badge flat';el.textContent='● '+abs+' (0.00%)';}
 }
+
+function commas(v){return v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmt$(v){return(v<0?'-$':'$')+commas(Math.abs(v));}
+function fmtK(v){const abs=Math.abs(v);return(v<0?'-$':'$')+(abs>=1000000?(abs/1000000).toFixed(2)+'M':abs>=1000?(abs/1000).toFixed(1)+'k':commas(abs));}
 
 function genHistory(price,days,vol=0.008){
   const arr=[];let p=price*(1-(Math.random()*0.05));
@@ -409,21 +714,21 @@ function makeLine(id,labels,datasets,opts={}){
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
     scales:{
-      x:{ticks:{color:'#7a8060',font:{size:11},maxTicksLimit:8,maxRotation:0},grid:{color:'#252010'}},
-      y:{ticks:{color:'#7a8060',font:{size:11}},grid:{color:'#252010'}},
-      ...(opts.y2?{y2:{position:'right',ticks:{color:'#72b862',font:{size:11}},grid:{display:false}}}:{})
+      x:{ticks:{color:'#8a9070',font:{size:12},maxTicksLimit:8,maxRotation:0},grid:{color:'#2a2210'}},
+      y:{ticks:{color:'#8a9070',font:{size:12}},grid:{color:'#2a2210'}},
+      ...(opts.y2?{y2:{position:'right',ticks:{color:'#7acc6e',font:{size:12}},grid:{display:false}}}:{})
     },
-    elements:{point:{radius:0,hitRadius:10},line:{tension:0.35}}
+    elements:{point:{radius:0,hitRadius:12},line:{tension:0.35}}
   }});
 }
 function renderHistCharts(){
   const{lc,fc,cn}=DATA;if(!lc)return;
   const labs=genLabels(histRange);
-  makeLine('hist-lc',labs,[{label:'Live Cattle',data:genHistory(lc.price,histRange,0.01),borderColor:'#c07858',borderWidth:2,fill:false}]);
-  makeLine('hist-fc',labs,[{label:'Feeder Cattle',data:genHistory(fc.price,histRange,0.012),borderColor:'#d4a84b',borderWidth:2,fill:false}]);
-  makeLine('hist-cn',labs,[{label:'Corn',data:genHistory(cn.price,histRange,0.015),borderColor:'#72b862',borderWidth:2,fill:false}]);
+  makeLine('hist-lc',labs,[{label:'Live Cattle',data:genHistory(lc.price,histRange,0.01),borderColor:'#d08868',borderWidth:2,fill:false}]);
+  makeLine('hist-fc',labs,[{label:'Feeder Cattle',data:genHistory(fc.price,histRange,0.012),borderColor:'#e0b84b',borderWidth:2,fill:false}]);
+  makeLine('hist-cn',labs,[{label:'Corn',data:genHistory(cn.price,histRange,0.015),borderColor:'#7acc6e',borderWidth:2,fill:false}]);
   const lcH=genHistory(lc.price,histRange,0.01),fcH=genHistory(fc.price,histRange,0.012);
-  makeLine('hist-spread',labs,[{label:'Spread',data:lcH.map((v,i)=>parseFloat((v-fcH[i]).toFixed(2))),borderColor:'#d4a84b',borderWidth:2,fill:true,backgroundColor:'rgba(212,168,75,.07)'}]);
+  makeLine('hist-spread',labs,[{label:'Spread',data:lcH.map((v,i)=>parseFloat((v-fcH[i]).toFixed(2))),borderColor:'#e0b84b',borderWidth:2,fill:true,backgroundColor:'rgba(224,184,75,.07)'}]);
 }
 function setRange(r,btn){
   histRange=r;
@@ -437,16 +742,14 @@ function renderSeasonal(){
   const seasonal=[2.1,1.8,3.2,3.8,3.5,1.2,-0.8,-1.5,-2.1,-0.5,2.2,1.4];
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const curMonth=new Date().getMonth();
-  const colors=seasonal.map((_,i)=>i===curMonth?'#d4a84b':seasonal[i]>=0?'rgba(114,184,98,.55)':'rgba(200,120,88,.55)');
+  const colors=seasonal.map((_,i)=>i===curMonth?'#e0b84b':seasonal[i]>=0?'rgba(122,204,110,.6)':'rgba(216,144,112,.6)');
   charts['seasonal-chart']=new Chart(ctx,{type:'bar',data:{labels:months,datasets:[{data:seasonal,backgroundColor:colors,borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>(c.raw>=0?'+':'')+c.raw+'% vs annual avg'}}},
-      scales:{x:{ticks:{color:'#7a8060',font:{size:11}},grid:{display:false}},y:{ticks:{color:'#7a8060',font:{size:11},callback:v=>(v>=0?'+':'')+v+'%'},grid:{color:'#252010'}}}
+      scales:{x:{ticks:{color:'#8a9070',font:{size:12}},grid:{display:false}},y:{ticks:{color:'#8a9070',font:{size:12},callback:v=>(v>=0?'+':'')+v+'%'},grid:{color:'#2a2210'}}}
     }});
 }
 
-function fmt$(v){return(v<0?'-$':'$')+Math.abs(v).toFixed(2);}
-function fmtK(v){return(v<0?'-$':'$')+(Math.abs(v)>=1000?(Math.abs(v)/1000).toFixed(1)+'k':Math.abs(v).toFixed(0));}
 function calc(){
   const bw=+document.getElementById('bw').value,bp=+document.getElementById('bp').value/100;
   const sw=+document.getElementById('sw').value,dof=+document.getElementById('dof').value;
@@ -465,7 +768,7 @@ function calc(){
   document.getElementById('herd-rev').textContent=fmtK(revenue*herd);
   document.getElementById('herd-cost').textContent=fmtK(totalCost*herd);
   document.getElementById('herd-margin').textContent=fmtK(margin*herd);
-  document.getElementById('herd-margin').style.color=margin>=0?'#72b862':'#c87858';
+  document.getElementById('herd-margin').style.color=margin>=0?'#7acc6e':'#d89070';
   document.getElementById('herd-daily').textContent=fmtK((cf*cp+oc)*herd);
   const verd=document.getElementById('verdict');
   if(margin>200){verd.className='verdict feed-steer';verd.textContent='Feed to finish — strong margin of '+fmt$(margin)+'/head at current prices.';}
@@ -473,81 +776,108 @@ function calc(){
   else{verd.className='verdict sell-corn';verd.textContent='Currently losing '+fmt$(Math.abs(margin))+'/head to finish. Consider selling corn or moving animals early.';}
 }
 
-async function loadWeather(){
-  const cities=[
-    {t:'wx-1',c:'wc-1',n:'wn-1',lat:42.03,lon:-93.62},
-    {t:'wx-2',c:'wc-2',n:'wn-2',lat:40.69,lon:-89.59},
-    {t:'wx-3',c:'wc-3',n:'wn-3',lat:39.96,lon:-82.99},
-    {t:'wx-4',c:'wc-4',n:'wn-4',lat:41.26,lon:-95.93},
-  ];
+// Haversine distance in miles
+function distMiles(lat1,lon1,lat2,lon2){
+  const R=3958.8,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+// Barn and locker coordinates
+const BARNS=[
+  {id:'central',lat:44.2933,lon:-92.6744},
+  {id:'lanesboro',lat:43.7180,lon:-91.9802},
+  {id:'rockcreek',lat:45.9524,lon:-92.9577},
+  {id:'sleepyeye',lat:44.2972,lon:-94.7244},
+  {id:'pipestone',lat:43.9939,lon:-96.3172},
+];
+const LOCKERS=[
+  {id:'herdas',lat:44.2955,lon:-93.2688},
+  {id:'kreniks',lat:44.3900,lon:-93.5600},
+  {id:'lonsdale',lat:44.4791,lon:-93.4158},
+  {id:'dennison',lat:44.4063,lon:-92.9855},
+  {id:'okeefes',lat:44.3922,lon:-93.7302},
+];
+
+// Reverse geocode city name from coordinates
+async function getCityName(lat,lon){
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+    const d=await r.json();
+    const city=d.address.city||d.address.town||d.address.village||d.address.county||'Your Area';
+    const state=d.address.state_code||d.address.state||'';
+    return (city+' '+state).trim().toUpperCase();
+  }catch{return 'YOUR LOCATION';}
+}
+
+// Corn belt reference cities (always shown for context)
+const CORN_CITIES=[
+  {idx:1,name:'AMES IA',lat:42.03,lon:-93.62},
+  {idx:2,name:'PEORIA IL',lat:40.69,lon:-89.59},
+  {idx:3,name:'OMAHA NE',lat:41.26,lon:-95.93},
+  {idx:4,name:'ROCHESTER MN',lat:44.02,lon:-92.46},
+];
+
+async function loadWeather(userLat, userLon){
   const conds={0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',51:'Light drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',80:'Showers',95:'Thunderstorm'};
   const note=t=>t<28?'Frost risk':t<40?'Cold — low stress':t<60?'Cool — good':t<80?'Ideal conditions':t<90?'Warm — watch moisture':'Heat stress';
-  await Promise.all(cities.map(async c=>{
+
+  // Set corn belt city names
+  CORN_CITIES.forEach(c=>{
+    const el=document.getElementById('wx-city-'+c.idx);
+    if(el) el.textContent=c.name;
+  });
+
+  // Build fetch list — 4 corn belt + user location
+  const fetchList=[
+    ...CORN_CITIES.map(c=>({idx:c.idx, lat:c.lat, lon:c.lon, name:c.name})),
+    {idx:5, lat:userLat, lon:userLon, name:null},
+  ];
+
+  // Get user city name
+  if(userLat && userLon){
+    const cityName=await getCityName(userLat, userLon);
+    const el=document.getElementById('wx-city-5');
+    if(el) el.textContent=cityName;
+  }
+
+  await Promise.all(fetchList.map(async c=>{
     try{
       const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+c.lat+'&longitude='+c.lon+'&current=temperature_2m,weathercode&temperature_unit=fahrenheit');
       const d=await r.json();
       const temp=Math.round(d.current.temperature_2m),code=d.current.weathercode;
-      document.getElementById(c.t).textContent=temp+'°F';
-      document.getElementById(c.c).textContent=conds[code]||'Cloudy';
-      document.getElementById(c.n).textContent=note(temp);
-    }catch{document.getElementById(c.t).textContent='—';document.getElementById(c.c).textContent='Unavailable';document.getElementById(c.n).textContent='—';}
+      document.getElementById('wx-'+c.idx).textContent=temp+'°F';
+      document.getElementById('wc-'+c.idx).textContent=conds[code]||'Cloudy';
+      document.getElementById('wn-'+c.idx).textContent=note(temp);
+    }catch{
+      document.getElementById('wx-'+c.idx).textContent='—';
+      document.getElementById('wc-'+c.idx).textContent='Unavailable';
+      document.getElementById('wn-'+c.idx).textContent='—';
+    }
   }));
+
+  // Update barn distances
+  if(userLat && userLon){
+    BARNS.forEach(b=>{
+      const el=document.getElementById('dist-'+b.id);
+      if(el) el.textContent='~'+Math.round(distMiles(userLat,userLon,b.lat,b.lon))+' miles';
+    });
+    LOCKERS.forEach(l=>{
+      const el=document.getElementById('dist-'+l.id);
+      if(el) el.textContent='~'+Math.round(distMiles(userLat,userLon,l.lat,l.lon))+' miles';
+    });
+  }
 }
 
-async function loadSource(){
-  sourceLoaded=true;
-  const loading=document.getElementById('source-loading');
-  const grid=document.getElementById('source-grid');
-  const error=document.getElementById('source-error');
-
-  // RSS feeds via rss2json proxy (free, no key needed for public feeds)
-  const feeds=[
-    {url:'https://www.drovers.com/rss.xml',tag:'drovers',label:'Drovers'},
-    {url:'https://www.fb.org/newsroom/feed',tag:'fb',label:'Farm Bureau'},
-  ];
-
-  const proxyBase='https://api.rss2json.com/v1/api.json?rss_url=';
-  let articles=[];
-
-  await Promise.all(feeds.map(async feed=>{
-    try{
-      const r=await fetch(proxyBase+encodeURIComponent(feed.url));
-      const d=await r.json();
-      if(d.status==='ok'&&d.items){
-        d.items.slice(0,4).forEach(item=>{
-          articles.push({
-            title:item.title,
-            link:item.link,
-            date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—',
-            tag:feed.tag,
-            label:feed.label,
-          });
-        });
-      }
-    }catch(e){}
-  }));
-
-  loading.style.display='none';
-
-  if(articles.length===0){
-    error.style.display='block';
-    return;
+function initLocation(){
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>{ loadWeather(pos.coords.latitude, pos.coords.longitude); },
+      ()=>{ loadWeather(44.2955, -93.2688); } // fallback: Faribault
+    );
+  } else {
+    loadWeather(44.2955, -93.2688);
   }
-
-  // Sort by date, newest first, limit to 10
-  articles=articles.slice(0,10);
-  grid.style.display='grid';
-  grid.innerHTML=articles.map(a=>`
-    <div class="source-item">
-      <a href="${a.link}" target="_blank" rel="noopener">
-        <div class="source-tag ${a.tag}">${a.label}</div>
-        <div style="flex:1;">
-          <div class="source-headline">${a.title}</div>
-          <div class="source-meta">${a.date}</div>
-        </div>
-        <div class="source-arrow">↗</div>
-      </a>
-    </div>`).join('');
 }
 
 async function loadPrices(){
@@ -558,7 +888,16 @@ async function loadPrices(){
   const[lc,fc,cn]=await Promise.all([fetchOne('lc.f'),fetchOne('fc.f'),fetchOne('c.f')]);
   DATA={lc:lc||fb.lc,fc:fc||fb.fc,cn:cn||fb.cn};
   document.getElementById('status-txt').textContent=[lc,fc,cn].some(Boolean)?'Live data':'Recent values';
-  function set(id,d,isCorn){const fmt=v=>isCorn?v.toFixed(4):v.toFixed(2);document.getElementById('p-'+id).textContent=isCorn?'$'+fmt(d.price):fmt(d.price);document.getElementById('h-'+id).textContent=fmt(d.high);document.getElementById('l-'+id).textContent=fmt(d.low);document.getElementById('v-'+id).textContent=fmt(d.open);setBadge('b-'+id,d.change,d.pct);}
+  function set(id,d,isCorn){
+    const fmt=v=>isCorn?v.toFixed(4):v.toFixed(2);
+    const priceEl=document.getElementById('p-'+id);
+    priceEl.textContent=isCorn?'$'+fmt(d.price):fmt(d.price);
+    priceEl.style.color=d.change>0.005?'#7acc6e':d.change<-0.005?'#d89070':'#e0b84b';
+    document.getElementById('h-'+id).textContent=fmt(d.high);
+    document.getElementById('l-'+id).textContent=fmt(d.low);
+    document.getElementById('v-'+id).textContent=fmt(d.open);
+    setBadge('b-'+id,d.change,d.pct);
+  }
   set('lc',DATA.lc,false);set('fc',DATA.fc,false);set('cn',DATA.cn,true);
   const{lc:l,fc:f,cn:c}=DATA;
   let msg='';
@@ -572,8 +911,8 @@ async function loadPrices(){
   calc();
 }
 
-loadPrices();loadWeather();
-setInterval(loadPrices,15*60*1000);setInterval(loadWeather,30*60*1000);
+loadPrices();initLocation();
+setInterval(loadPrices,15*60*1000);setInterval(initLocation,30*60*1000);
 </script>
 </body>
 </html>
